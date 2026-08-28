@@ -3358,7 +3358,7 @@
       const [toNum, thuaNum] = activeP.id.split('-');
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = `ThuaDat_To${toNum}-Thua${thuaNum}.png`;
+      a.download = `To_${toNum}-Thua_${thuaNum}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -3405,7 +3405,7 @@
         const [toNum, thuaNum] = activeP.id.split('-');
         const a = document.createElement('a');
         a.href = dataUrl;
-        a.download = `ThuaDat_To${toNum}-Thua${thuaNum}.png`;
+        a.download = `To_${toNum}-Thua_${thuaNum}.png`;
         document.body.appendChild(a);
         a.click();
         a.remove();
