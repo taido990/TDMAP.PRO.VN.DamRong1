@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 280826  -->
+  <!-- 280826v1  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -4338,6 +4338,7 @@
     // thay vì để trống, để không phải tự gõ/tìm mỗi lần mở web.
     const DEFAULT_PROVINCE = 'Tỉnh Lâm Đồng';
     const DEFAULT_COMMUNE = 'Xã Đam Rông 1';
+    const DEFAULT_COMMUNE_CODE = '24886'; // ứng với thư mục Drive .../CSDL2026/Tỉnh Lâm Đồng/24886
 
     function extractDriveFolderId(url) {
       if (!url) return null;
@@ -4706,7 +4707,12 @@
     async function renderOfflineCacheList() {
       const listEl = document.getElementById('driveFileList');
       if (!listEl) return;
-      const cached = await LocalMapCache.listAll();
+      // Bản triển khai riêng cho Xã Đam Rông 1: CHỈ hiện/cho mở lại các bản đồ đã
+      // lưu trên máy thuộc ĐÚNG mã xã 24886 (thư mục .../CSDL2026/Tỉnh Lâm Đồng/
+      // 24886) - bỏ qua mọi bản đồ đã lưu từ trước của Xã/Phường khác (nếu máy
+      // này từng dùng qua bản TDMAP tổng quát để xem xã khác), tránh nhầm lẫn mở
+      // nhầm dữ liệu không phải của Đam Rông 1.
+      const cached = (await LocalMapCache.listAll()).filter(c => c.commCode === DEFAULT_COMMUNE_CODE);
       if (!cached.length) return;
       cached.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
 
@@ -4870,7 +4876,7 @@
               : '<span class="dfi-go">Mở ▸</span>';
           item.innerHTML = `<span class="dfi-icon">🗺️</span><span class="dfi-name"></span>${badge}`;
           item.querySelector('.dfi-name').textContent = f.name;
-          item.onclick = () => openDriveFile(f.id, f.name, apiKey, f.size, f.modifiedTime);
+          item.onclick = () => openDriveFile(f.id, f.name, apiKey, f.size, f.modifiedTime, commCode);
           listEl.appendChild(item);
         }
 
@@ -4878,7 +4884,7 @@
         // xếp ở trên) - người dân không cần tự bấm chọn, danh sách phía trên vẫn
         // còn đó để mở bản khác nếu muốn.
         const newest = sorted[0];
-        openDriveFile(newest.id, newest.name, apiKey, newest.size, newest.modifiedTime);
+        openDriveFile(newest.id, newest.name, apiKey, newest.size, newest.modifiedTime, commCode);
       } catch (err) {
         setDriveStatus(`Lỗi khi kết nối Google Drive: ${err.message || err}`, true);
       } finally {
@@ -4886,7 +4892,7 @@
       }
     }
 
-    async function openDriveFile(fileId, fileName, apiKey, fileSize, modifiedTime) {
+    async function openDriveFile(fileId, fileName, apiKey, fileSize, modifiedTime, commCode) {
       // 1) Đã có bản TRÙNG phiên bản lưu sẵn trên máy -> mở ngay, KHÔNG cần tải
       // mạng gì cả (nhanh gần như tức thì, kể cả không có mạng).
       if (modifiedTime) {
@@ -4960,7 +4966,7 @@
           // 2) LƯU (thay thế bản cũ nếu có) vào IndexedDB để lần sau mở tức thì.
           // Chạy nền, không chặn giao diện; nếu máy hết dung lượng/lỗi thì bỏ qua
           // âm thầm (app vẫn hoạt động bình thường, chỉ là không có cache).
-          LocalMapCache.save({ fileId, fileName, modifiedTime: modifiedTime || '', text });
+          LocalMapCache.save({ fileId, fileName, modifiedTime: modifiedTime || '', text, commCode: commCode || '' });
         }
       } catch (err) {
         // Mạng lỗi nhưng lỡ đã từng có bản cũ trên máy (khác phiên bản) -> vẫn cho
