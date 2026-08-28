@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 280826v1  -->
+  <!-- 280826v2  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -4684,10 +4684,6 @@
         document.getElementById('driveModalOverlay').classList.add('show');
       }
 
-      // Hiện ngay danh sách bản đồ đã lưu sẵn trên máy (không cần mạng) — hữu ích
-      // khi đang ngoài thực địa mất sóng, hoặc chỉ muốn mở lại xã vừa xem.
-      renderOfflineCacheList();
-
       // Tự động khôi phục Xã/Phường đã chọn lần trước (nếu có) và quét lại bản đồ
       // ngay, không cần người dùng chọn lại từ đầu mỗi lần mở web.
       loadDvhcData().then(() => {
@@ -4701,51 +4697,6 @@
             onCommuneInput();
           }
         }
-      });
-    }
-
-    async function renderOfflineCacheList() {
-      const listEl = document.getElementById('driveFileList');
-      if (!listEl) return;
-      // Bản triển khai riêng cho Xã Đam Rông 1: CHỈ hiện/cho mở lại các bản đồ đã
-      // lưu trên máy thuộc ĐÚNG mã xã 24886 (thư mục .../CSDL2026/Tỉnh Lâm Đồng/
-      // 24886) - bỏ qua mọi bản đồ đã lưu từ trước của Xã/Phường khác (nếu máy
-      // này từng dùng qua bản TDMAP tổng quát để xem xã khác), tránh nhầm lẫn mở
-      // nhầm dữ liệu không phải của Đam Rông 1.
-      const cached = (await LocalMapCache.listAll()).filter(c => c.commCode === DEFAULT_COMMUNE_CODE);
-      if (!cached.length) return;
-      cached.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-
-      const header = document.createElement('div');
-      header.style.cssText = 'font-size:10.5px;font-weight:800;color:#00c6a7;letter-spacing:.5px;padding:6px 2px;';
-      header.textContent = `📦 ĐÃ LƯU TRÊN MÁY NÀY (mở không cần mạng)`;
-      listEl.appendChild(header);
-
-      cached.forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'drive-file-item';
-        const savedDate = c.savedAt ? new Date(c.savedAt).toLocaleDateString('vi-VN') : '';
-        item.innerHTML = `<span class="dfi-icon">🗺️</span><span class="dfi-name"></span><span class="dfi-go">Mở ngay ▸</span>`;
-        item.querySelector('.dfi-name').textContent = `${c.fileName} · lưu ${savedDate}`;
-        item.onclick = async () => {
-          FileProgress.start(`📦 Đang mở "${c.fileName}" từ dữ liệu đã lưu trên máy...`);
-          FileProgress.set(40);
-          const ok = await processMapText(c.text, c.fileName, 40);
-          if (ok) { closeDriveModal(); showStatus(`✓ Mở "${c.fileName}" từ bộ nhớ máy (ngoại tuyến)`); }
-        };
-        item.oncontextmenu = null;
-        const delBtn = document.createElement('span');
-        delBtn.textContent = '✕';
-        delBtn.title = 'Xoá bản lưu này khỏi máy';
-        delBtn.style.cssText = 'margin-left:8px;color:#c33;cursor:pointer;font-weight:800;flex-shrink:0;';
-        delBtn.onclick = async (ev) => {
-          ev.stopPropagation();
-          await LocalMapCache.remove(c.fileId);
-          listEl.innerHTML = '';
-          renderOfflineCacheList();
-        };
-        item.appendChild(delBtn);
-        listEl.appendChild(item);
       });
     }
 
