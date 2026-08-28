@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 280826v4  -->
+  <!-- 280826v5  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -3316,15 +3316,61 @@
       }
     }
 
+    // Lazy-load html2canvas (chỉ tải khi thật sự cần - xem captureInfoCardFallback
+    // bên dưới), giống cách các thư viện phụ khác trong app này được tải "lazy".
+    let __html2canvasState = 'idle'; // idle | loading | ready
+    function ensureHtml2CanvasLoaded() {
+      return new Promise((resolve) => {
+        if (__html2canvasState === 'ready' || typeof html2canvas !== 'undefined') {
+          __html2canvasState = 'ready'; resolve(); return;
+        }
+        if (__html2canvasState === 'loading') {
+          document.addEventListener('html2canvas-ready', () => resolve(), { once: true });
+          return;
+        }
+        __html2canvasState = 'loading';
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload = () => { __html2canvasState = 'ready'; document.dispatchEvent(new Event('html2canvas-ready')); resolve(); };
+        s.onerror = () => { __html2canvasState = 'idle'; console.error('Không tải được thư viện html2canvas.'); resolve(); };
+        document.head.appendChild(s);
+      });
+    }
+
+    // Chụp riêng khung thông tin thửa (#popupCaptureArea - chỉ có chữ, KHÔNG có
+    // ảnh vệ tinh) bằng html2canvas. Dùng làm PHƯƠNG ÁN DỰ PHÒNG cho các trình
+    // duyệt/thiết bị KHÔNG hỗ trợ Screen Capture API (getDisplayMedia) - chủ yếu
+    // là điện thoại (Android Chrome, Safari iOS đều chưa hỗ trợ API đó) - để vẫn
+    // lưu lại được ảnh có Tờ/Thửa thay vì chỉ báo lỗi suông, đúng mục đích chính
+    // của nút này (cung cấp Tờ/Thửa cho đơn vị đo đạc). KHÔNG dùng html2canvas
+    // để chụp cả bản đồ vì lớp ảnh vệ tinh tải từ Google là ảnh cross-origin
+    // (mt{s}.google.com, không có header CORS) - html2canvas sẽ không đọc được
+    // ra ảnh, làm ảnh chụp bị thiếu nền hoặc lỗi.
+    async function captureInfoCardFallback() {
+      await ensureHtml2CanvasLoaded();
+      if (typeof html2canvas === 'undefined') {
+        showAlert('Không tải được công cụ chụp ảnh (cần có kết nối mạng).\n\nVui lòng dùng chức năng chụp màn hình có sẵn trên máy: điện thoại (giữ nút Nguồn + Giảm âm lượng cùng lúc), máy tính (phím PrtScn hoặc Snipping Tool).');
+        return;
+      }
+      const target = document.getElementById('popupCaptureArea');
+      const canvas = await html2canvas(target, { backgroundColor: '#ffffff', scale: 2 });
+      const dataUrl = canvas.toDataURL('image/png');
+      const [toNum, thuaNum] = activeP.id.split('-');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `ThuaDat_To${toNum}-Thua${thuaNum}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showStatus('✓ Đã lưu ảnh thông tin thửa');
+    }
+
     // Chụp TOÀN BỘ giao diện đang xem (bản đồ ảnh vệ tinh + ranh thửa tô màu +
-    // bảng thông tin) chứ không chỉ riêng khung thông tin. KHÔNG dùng html2canvas
-    // vì lớp ảnh vệ tinh tải từ Google là ảnh cross-origin (mt{s}.google.com,
-    // không có header CORS) - canvas kiểu "vẽ lại DOM" sẽ bị "taint" và không đọc
-    // được ảnh vệ tinh ra, gây ảnh chụp bị thiếu nền hoặc lỗi. Thay vào đó dùng
-    // Screen Capture API (getDisplayMedia) để chụp lại đúng những gì trình duyệt
-    // đang HIỂN THỊ (không bị giới hạn CORS) - người dùng cần chọn tab/màn hình
-    // đang xem trong hộp thoại trình duyệt hiện ra. API này chỉ có trên trình
-    // duyệt máy tính + Android Chrome bản mới; Safari iOS chưa hỗ trợ.
+    // bảng thông tin) trên trình duyệt/thiết bị hỗ trợ Screen Capture API
+    // (getDisplayMedia - chủ yếu trình duyệt máy tính; hầu hết trình duyệt điện
+    // thoại KHÔNG hỗ trợ API này). Khi không hỗ trợ (hoặc gặp lỗi giữa chừng khi
+    // đã hỗ trợ), tự động rơi về captureInfoCardFallback() ở trên để vẫn lưu
+    // được ảnh có Tờ/Thửa, thay vì chỉ hiện thông báo lỗi cho người dùng.
     async function captureParcelScreenshot() {
       if (!activeP) return;
       const btn = document.getElementById('btnShot');
@@ -3332,7 +3378,7 @@
       let stream = null;
       try {
         if (!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) {
-          showAlert('Trình duyệt này chưa hỗ trợ chụp toàn bộ giao diện.\n\nVui lòng dùng chức năng chụp màn hình có sẵn trên máy: điện thoại (giữ nút Nguồn + Giảm âm lượng cùng lúc), máy tính (phím PrtScn hoặc Snipping Tool).');
+          await captureInfoCardFallback();
           return;
         }
         showStatus('Vui lòng chọn đúng tab/màn hình đang xem để chụp...');
@@ -3369,7 +3415,11 @@
           showStatus('Đã huỷ chụp màn hình.');
         } else {
           console.error(e);
-          showAlert('Không chụp được ảnh. Vui lòng thử lại hoặc dùng chức năng chụp màn hình có sẵn trên điện thoại/máy tính.');
+          try {
+            await captureInfoCardFallback();
+          } catch (e2) {
+            showAlert('Không chụp được ảnh. Vui lòng thử lại hoặc dùng chức năng chụp màn hình có sẵn trên điện thoại/máy tính.');
+          }
         }
       } finally {
         if (stream) stream.getTracks().forEach(t => t.stop());
