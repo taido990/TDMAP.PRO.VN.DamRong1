@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 280826v2  -->
+  <!-- 280826v3  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -973,20 +973,6 @@
     }
 
     /* ── MODAL: MỞ FILE .GEOJSON TỪ GOOGLE DRIVE ─────────────────────────────── */
-    .drive-field-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #666;
-      margin: 6px 0 2px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .drive-field-label:first-child {
-      margin-top: 0;
-    }
-
     .drive-help-link {
       font-size: 11px;
       font-weight: 700;
@@ -1016,15 +1002,6 @@
       color: #888;
     }
 
-    .drive-remember-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 8px;
-      font-size: 12px;
-      color: #777;
-    }
-
     #driveListBtn {
       margin-top: 12px;
       width: 100%;
@@ -1044,48 +1021,6 @@
 
     #driveListBtn:disabled {
       opacity: .6;
-    }
-
-    /* NÚT "DÙNG VỊ TRÍ CỦA TÔI" - tự dò Xã/Phường theo GPS trong khung Chọn Xã */
-    #autoLocateXaBtn {
-      width: 100%;
-      border: none;
-      border-radius: 8px;
-      background: #1a6fd4;
-      color: #fff;
-      font-weight: 700;
-      font-size: 13px;
-      padding: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    #autoLocateXaBtn:active {
-      filter: brightness(.85);
-    }
-
-    #autoLocateXaBtn:disabled {
-      opacity: .6;
-    }
-
-    .drive-or-divider {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
-      color: #999;
-      font-size: 11px;
-    }
-
-    .drive-or-divider::before,
-    .drive-or-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(0, 0, 0, 0.1);
     }
 
     #driveLoginBtn {
@@ -1679,12 +1614,12 @@
         tỉnh Lâm Đồng</div>
       <div class="circle-row">
         <div class="circle-item">
-          <div class="circle drive" onclick="openDriveModal(true)">🏘️</div>
-          <span class="circle-label">Chọn Xã/Phường</span>
+          <div class="circle drive" onclick="loadDamRong1Map(true)">🗺️</div>
+          <span class="circle-label">Xem bản đồ</span>
         </div>
       </div>
       <h2>Tra cứu thông tin thửa đất</h2>
-      <p>Chọn Tỉnh/Thành và Xã/Phường nơi bạn muốn xem<br>để hiển thị bản đồ ranh thửa trên ảnh vệ tinh</p>
+      <p>Bấm vào biểu tượng để xem bản đồ ranh thửa Xã Đam Rông 1<br>trên ảnh vệ tinh</p>
     </div>
   </div>
 
@@ -1716,7 +1651,8 @@
   </div>
 
   <div id="searchBar">
-    <button id="moreToolsBtn" onclick="openDriveModal()" title="Chọn Xã/Phường khác">🏘️ Chọn xã</button>
+    <button id="moreToolsBtn" onclick="loadDamRong1Map(false)" title="Tải lại bản đồ Xã Đam Rông 1">🔄 Tải lại bản
+      đồ</button>
     <div class="divider"></div>
     <input id="searchInput" type="search" placeholder="Nhập Tờ-Thửa..." autocomplete="off" oninput="onInputSearch()"
       onkeydown="if(event.key==='Enter') executeSearch()" onfocus="onInputSearch()">
@@ -1840,7 +1776,9 @@
     </div>
   </div>
 
-  <!-- MODAL: CHỌN XÃ/PHƯỜNG ĐỂ TẢI BẢN ĐỒ (Google Drive) -->
+  <!-- MODAL: BẢN ĐỒ XÃ ĐAM RÔNG 1 (Google Drive) - bản triển khai riêng cho 1 Xã
+       duy nhất nên KHÔNG còn form chọn Tỉnh/Xã; chỉ hiện trạng thái quét/tải file
+       và danh sách file (để mở lại bản cũ hơn nếu muốn) khi cần. -->
   <div id="driveModalOverlay" class="modal-overlay">
     <div class="modal-box" style="max-width:380px;">
       <div class="modal-header"><svg width="18" height="18" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
@@ -1848,46 +1786,15 @@
           <polygon points="50,6 6,88 50,60" fill="#2684FC" />
           <polygon points="50,6 50,60 94,88" fill="#00AC47" />
           <polygon points="6,88 94,88 50,60" fill="#FFBA00" />
-        </svg> Chọn Xã/Phường để xem bản đồ</div>
+        </svg> Bản đồ Xã Đam Rông 1</div>
       <div class="modal-body">
-        <button id="autoLocateXaBtn" onclick="autoLocateXa()">📍 Dùng vị trí hiện tại của tôi</button>
-        <div class="drive-or-divider">hoặc chọn thủ công</div>
-        <div style="display:flex; gap:10px;">
-          <div style="flex:1;">
-            <div class="drive-field-label"><span>Tỉnh / Thành</span></div>
-            <input class="drive-input" list="dlProvinces" id="driveProvinceInput" oninput="onProvinceInput()"
-              placeholder="Tỉnh...">
-            <datalist id="dlProvinces"></datalist>
-          </div>
-          <div style="flex:1;">
-            <div class="drive-field-label"><span>Xã / Phường</span></div>
-            <input class="drive-input" list="dlCommunes" id="driveCommuneInput" oninput="onCommuneInput()"
-              placeholder="Xã..." disabled>
-            <datalist id="dlCommunes"></datalist>
-          </div>
-        </div>
+        <input class="drive-input" id="driveFolderInput" type="text" style="display:none;">
 
-        <div>
-          <div class="drive-field-label"><span>Mã xã</span></div>
-          <input class="drive-input" id="driveCommuneCodeInput" type="text" placeholder="Mã xã" readonly>
-        </div>
-
-        <div style="display:none;">
-          <input class="drive-input" id="driveApiKeyInput" type="text">
-          <input class="drive-input" id="driveFolderInput" type="text">
-        </div>
-
-        <label class="drive-remember-row">
-          <input type="checkbox" id="driveRememberChk" checked style="margin:0;">
-          Ghi nhớ Xã/Phường cho lần mở sau
-        </label>
-
-        <button id="driveListBtn" disabled onclick="listDriveGeojsonFiles()">🔍 Tải lại danh sách bản đồ</button>
+        <button id="driveListBtn" onclick="loadDamRong1Map(false)">🔄 Tải lại bản đồ</button>
         <div id="driveStatusMsg" style="display:none;"></div>
         <div id="driveFileList"></div>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn ghost" onclick="clearDriveSettings()">Xóa thiết lập</button>
         <button class="modal-btn secondary" onclick="closeDriveModal()">Đóng</button>
       </div>
     </div>
@@ -1895,108 +1802,6 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <!-- TỐI ƯU: dvhc2025.js (danh mục 63 tỉnh + hàng nghìn xã) chỉ cần cho tính năng
-       Google Drive, KHÔNG cần để hiển thị bản đồ. Trước đây tải đồng bộ (blocking)
-       ngay đầu <head> khiến MỌI người dùng phải chờ file này tải+chạy xong mới
-       thấy được trang. Nay tải "defer" (không chặn parse HTML) + chỉ inject thẻ
-       script thật sự lúc người dùng mở modal Google Drive lần đầu (xem hàm
-       ensureDvhcScriptLoaded() bên dưới). -->
-  <script>
-    let __dvhcScriptState = 'idle'; // idle | loading | ready
-    function ensureDvhcScriptLoaded() {
-      return new Promise((resolve) => {
-        if (__dvhcScriptState === 'ready' || typeof dvhcDataList !== 'undefined') {
-          __dvhcScriptState = 'ready'; resolve(); return;
-        }
-        if (__dvhcScriptState === 'loading') {
-          document.addEventListener('dvhc-ready', () => resolve(), { once: true });
-          return;
-        }
-        __dvhcScriptState = 'loading';
-        const s = document.createElement('script');
-        // Ghép đường dẫn tương đối "dvhc2025.js" với document.baseURI (URL thật
-        // của chính file index2108.html đang chạy) thay vì để trình duyệt tự suy
-        // ra - đảm bảo LUÔN lấy đúng file dvhc2025.js nằm CÙNG THƯ MỤC với file
-        // HTML đang mở (kể cả khi test cục bộ trên máy bằng cách mở trực tiếp
-        // file, hay khi chạy qua 1 server nội bộ có đường dẫn lồng nhau).
-        s.src = new URL('dvhc2025.js', document.baseURI).href;
-        s.onload = () => { __dvhcScriptState = 'ready'; document.dispatchEvent(new Event('dvhc-ready')); resolve(); };
-        s.onerror = () => {
-          __dvhcScriptState = 'idle';
-          console.error('Không tải được dvhc2025.js tại: ' + s.src + ' — hãy kiểm tra file này có nằm cùng thư mục với file HTML đang chạy không.');
-          if (typeof setDriveStatus === 'function') {
-            setDriveStatus('Không tải được dữ liệu Tỉnh/Xã (dvhc2025.js). Hãy đảm bảo file dvhc2025.js nằm cùng thư mục với file HTML đang chạy.', true);
-          }
-          resolve();
-        };
-        document.head.appendChild(s);
-      });
-    }
-  </script>
-  <!-- RANH GIỚI HÀNH CHÍNH (đã đơn giản hoá) của 3.321 Xã/Phường sau sáp nhập 2025,
-       dùng cho tính năng "Dùng vị trí hiện tại của tôi" (tự dò Xã/Phường theo GPS).
-       Để nhẹ (KHÔNG bắt người dùng tải hẳn 1 file ~7MB gộp cả nước mỗi lần định vị),
-       dữ liệu được TÁCH SẴN theo Tỉnh (34 file nhỏ trong thư mục ranhgioi_xa/,
-       xem ranhgioi_tinh_bbox.js cho danh sách + bounding-box từng tỉnh):
-       bấm định vị -> chỉ tải file bbox nhỏ (~5KB) để đoán tỉnh nào chứa toạ độ đó
-       -> rồi mới tải ĐÚNG 1 (hoặc vài, nếu gần biên giới 2 tỉnh) file ranh giới Xã
-       của riêng tỉnh đó (~100-400KB) để xác định chính xác Xã/Phường. Tải "lazy"
-       giống dvhc2025.js - chỉ tải khi người dùng bấm nút định vị lần đầu, không
-       chặn hiển thị bản đồ. Xem ensureTinhBBoxLoaded()/loadXaBoundaryForProvince() +
-       autoLocateXa() ở phần code phía dưới. -->
-  <script>
-    let __tinhBBoxState = 'idle'; // idle | loading | ready
-    function ensureTinhBBoxLoaded() {
-      return new Promise((resolve) => {
-        if (__tinhBBoxState === 'ready' || typeof tinhBBoxList !== 'undefined') {
-          __tinhBBoxState = 'ready'; resolve(); return;
-        }
-        if (__tinhBBoxState === 'loading') {
-          document.addEventListener('tinh-bbox-ready', () => resolve(), { once: true });
-          return;
-        }
-        __tinhBBoxState = 'loading';
-        const s = document.createElement('script');
-        s.src = new URL('ranhgioi_tinh_bbox.js', document.baseURI).href;
-        s.onload = () => { __tinhBBoxState = 'ready'; document.dispatchEvent(new Event('tinh-bbox-ready')); resolve(); };
-        s.onerror = () => {
-          __tinhBBoxState = 'idle';
-          console.error('Không tải được ranhgioi_tinh_bbox.js tại: ' + s.src + ' — hãy kiểm tra file này có nằm cùng thư mục với file HTML đang chạy không.');
-          resolve();
-        };
-        document.head.appendChild(s);
-      });
-    }
-  </script>
-  <script>
-    // Tải riêng file ranh giới Xã của 1 Tỉnh (vd "ranhgioi_xa/01.js") - cache lại
-    // theo maTP để bấm định vị lại lần sau (hoặc thử tỉnh lân cận khi ở gần biên
-    // giới) không phải tải lại. Mỗi file chỉ gán "var xaBoundaryDataList = [...]"
-    // (dùng "var" thay vì "const" để có thể nạp NHIỀU file .js khác nhau cùng biến
-    // này qua nhiều thẻ <script> nối tiếp mà không bị lỗi khai báo trùng), nên phải
-    // đọc + lưu vào cache NGAY sau khi script vừa tải xong, trước khi tải file tiếp theo.
-    const xaBoundaryDataByProvince = {};
-    function loadXaBoundaryForProvince(maTP) {
-      if (xaBoundaryDataByProvince[maTP]) return Promise.resolve(xaBoundaryDataByProvince[maTP]);
-      return new Promise((resolve) => {
-        const s = document.createElement('script');
-        const fileName = `ranhgioi_xa/${String(parseInt(maTP, 10)).padStart(2, '0')}.js`;
-        s.src = new URL(fileName, document.baseURI).href;
-        s.onload = () => {
-          const data = (typeof xaBoundaryDataList !== 'undefined') ? xaBoundaryDataList : null;
-          xaBoundaryDataByProvince[maTP] = data;
-          s.remove();
-          resolve(data);
-        };
-        s.onerror = () => {
-          console.error('Không tải được ' + fileName);
-          s.remove();
-          resolve(null);
-        };
-        document.head.appendChild(s);
-      });
-    }
-  </script>
   <script>
     // ── DIRECTIONS (CHỈ ĐƯỜNG TRỰC TIẾP TRONG WEB) ────────────────────────────────
     let routeLine = null;
@@ -3705,7 +3510,7 @@
 
       // Kiểm tra xem đã load dữ liệu chưa
       if (allParcels.length === 0) {
-        showAlert("Bạn chưa chọn Xã/Phường để tải bản đồ.\nVui lòng nhấn nút 'Chọn xã' trước khi tìm kiếm!");
+        showAlert("Bản đồ chưa được tải.\nVui lòng nhấn nút 'Tải lại bản đồ' trước khi tìm kiếm!");
         return;
       }
 
@@ -4280,24 +4085,21 @@
       return { get, listAll, save, remove };
     })();
 
-    // ── MỞ FILE .GEOJSON TỪ GOOGLE DRIVE ───────────────────────────────────────────
-    // Ghi chú: Google Drive API v3 luôn cần một API Key hợp lệ để liệt kê/tải nội dung
-    // file bằng JavaScript phía trình duyệt — kể cả khi thư mục đã ở chế độ
-    // "Bất kỳ ai có đường liên kết". Người dùng tự tạo API Key miễn phí tại
-    // Google Cloud Console (bật "Google Drive API"), dán vào ô bên dưới 1 lần,
-    // TDMAP sẽ ghi nhớ (localStorage) cho các lần mở sau.
-    const GDRIVE_KEY_STORAGE = 'tdmap_gdrive_apikey_v1';
+    // ── BẢN ĐỒ XÃ ĐAM RÔNG 1 TỪ GOOGLE DRIVE ─────────────────────────────────────────
+    // File này CHỈ phục vụ duy nhất Xã Đam Rông 1 (Tỉnh Lâm Đồng, mã xã 24886) -
+    // không có tính năng chọn Xã/Phường khác. Ghi chú: Google Drive API v3 luôn
+    // cần một API Key hợp lệ để liệt kê/tải nội dung file bằng JavaScript phía
+    // trình duyệt — kể cả khi thư mục đã ở chế độ "Bất kỳ ai có đường liên kết".
     const GDRIVE_FOLDER_STORAGE = 'tdmap_gdrive_folder_v1';
     // KHÔNG gắn cứng API Key thật (dạng "AIzaSy...") vào code (file này có thể bị
     // đẩy lên kho GitHub công khai -> lộ key ngay lập tức, bị secret-scanning
-    // quét ra). Thay vào đó dùng BÍ DANH NGẮN: người dùng chỉ cần dán mã ngắn
-    // bên dưới vào ô "Google API Key", code sẽ tự tra ra key thật tương ứng.
-    // Lưu ý: đây chỉ là CHE GIẤU (obfuscation) để tránh lộ liễu/tránh bị máy quét
-    // tự động phát hiện, KHÔNG phải bảo mật thật sự — ai đọc kỹ mã nguồn vẫn có
-    // thể giải mã lại được. Bảo mật thật sự nằm ở việc giới hạn key theo
-    // HTTP referrer (chỉ cho phép domain của bạn) trong Google Cloud Console.
+    // quét ra). Thay vào đó dùng BÍ DANH NGẮN (Tdmap+mã xã), code tự tra ra key
+    // thật tương ứng. Lưu ý: đây chỉ là CHE GIẤU (obfuscation) để tránh lộ liễu/
+    // tránh bị máy quét tự động phát hiện, KHÔNG phải bảo mật thật sự — ai đọc kỹ
+    // mã nguồn vẫn có thể giải mã lại được. Bảo mật thật sự nằm ở việc giới hạn
+    // key theo HTTP referrer (chỉ cho phép domain của bạn) trong Google Cloud Console.
     const GDRIVE_KEY_ALIASES = {
-      // 'Bí danh ngắn gửi cho người dùng': 'Chuỗi key đã che giấu (mã hóa XOR + base64)'
+      // 'Bí danh ngắn': 'Chuỗi key đã che giấu (mã hóa XOR + base64)'
       'TDMAP-2026': 'FQ03IANLcWhYZw46AzIuLXJ8Cydden4ABSYpIXRnIyAMIGACSkFB'
     };
     const GDRIVE_KEY_PAD = 'TDMAP2026SECRET'; // khóa che giấu dùng chung cho XOR ở trên
@@ -4313,8 +4115,6 @@
         return out;
       } catch (e) { return ''; }
     }
-    // Nếu người dùng dán đúng bí danh dạng Tdmap+MãXã (vd "Tdmap24301") thì tự đổi thành key thật;
-    // nếu dán thẳng 1 API Key bình thường (dạng AIzaSy...) thì vẫn dùng nguyên như cũ.
     function resolveGdriveApiKey(raw) {
       const v = (raw || '').trim();
       if (v.toLowerCase().startsWith('tdmap') && v.length > 5) {
@@ -4323,19 +4123,7 @@
       if (GDRIVE_KEY_ALIASES[v]) return decodeGdriveKeyToken(GDRIVE_KEY_ALIASES[v]);
       return v;
     }
-    // Kiểm tra key có đúng format Tdmap + mã xã hiện tại không
-    function validateTdmapKey(raw, commCode) {
-      if (!raw || !commCode) return false;
-      const v = raw.trim();
-      const expected = 'Tdmap' + commCode;
-      return v === expected;
-    }
-    const GDRIVE_DEFAULT_APIKEY = 'Tdmap';
-    const GDRIVE_DEFAULT_FOLDER = '';
 
-    // Bản triển khai riêng cho Xã Đam Rông 1 (Tỉnh Lâm Đồng, mã xã 24886) - khi
-    // người dùng chưa từng lưu Tỉnh/Xã nào trước đó, tự động chọn sẵn Xã này
-    // thay vì để trống, để không phải tự gõ/tìm mỗi lần mở web.
     const DEFAULT_PROVINCE = 'Tỉnh Lâm Đồng';
     const DEFAULT_COMMUNE = 'Xã Đam Rông 1';
     const DEFAULT_COMMUNE_CODE = '24886'; // ứng với thư mục Drive .../CSDL2026/Tỉnh Lâm Đồng/24886
@@ -4350,267 +4138,7 @@
       return null;
     }
 
-    let dvhcData = [];
-    let provincesMap = new Map();
-    let communesMap = new Map();
-
-    async function loadDvhcData() {
-      if (dvhcData.length === 0) {
-        await ensureDvhcScriptLoaded();
-        try {
-          if (typeof dvhcDataList !== 'undefined') {
-            dvhcData = dvhcDataList;
-            dvhcData.forEach(item => {
-              if (item["Tỉnh / Thành Phố"] && item["Mã TP"]) {
-                if (!provincesMap.has(item["Tỉnh / Thành Phố"])) {
-                  provincesMap.set(item["Tỉnh / Thành Phố"], item["Mã TP"]);
-                }
-              }
-            });
-
-            const dlProv = document.getElementById('dlProvinces');
-            dlProv.innerHTML = '';
-            const sortedProvs = Array.from(provincesMap.keys()).sort((a, b) => a.localeCompare(b));
-            sortedProvs.forEach(name => {
-              const opt = document.createElement('option');
-              opt.value = name;
-              dlProv.appendChild(opt);
-            });
-          } else {
-            console.error("Không tìm thấy biến dvhcDataList, hãy kiểm tra file dvhc2025.js");
-          }
-        } catch (e) {
-          console.error("Lỗi nạp dvhc2025", e);
-        }
-      }
-    }
-
-    // ── CHỌN XÃ THEO ĐỊNH VỊ (GPS) ─────────────────────────────────────────────────
-    // Dò xem toạ độ GPS hiện tại nằm trong ranh giới của Xã/Phường nào, rồi tự
-    // điền Tỉnh/Xã và gọi luôn onCommuneInput() để tự kết nối/tải bản đồ của Xã đó
-    // - người dùng không cần tự gõ/tìm tên Xã của mình. Mã Xã lấy từ trường SHTHUA
-    // (Số thửa) của file ranh giới gốc (định dạng cadastral tái sử dụng cho lớp
-    // ranh giới hành chính) - trùng với trường "Mã" trong dvhc2025.js.
-    //
-    // Để nhẹ, KHÔNG dò trên dữ liệu ranh giới cả nước cùng lúc: trước tiên dùng
-    // ranhgioi_tinh_bbox.js (~5KB, xem ensureTinhBBoxLoaded() ở trên) để đoán
-    // (các) Tỉnh có bounding-box chứa toạ độ đó, rồi CHỈ tải ranh giới Xã của
-    // (các) Tỉnh nghi ngờ đó (mỗi Tỉnh ~100-400KB, xem loadXaBoundaryForProvince())
-    // để xác định chính xác bằng ray-casting.
-
-    // Ray-casting kiểm tra 1 điểm (lon,lat) có nằm trong 1 ring hay không - CHÚ Ý
-    // ring ở đây theo đúng thứ tự toạ độ GeoJSON gốc [lon, lat] (khác với
-    // pointInRing() dùng cho thửa đất ở trên vốn nhận [lat, lon] kiểu Leaflet).
-    function pointInGeoJSONRing(lon, lat, ring) {
-      let inside = false;
-      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-        const xi = ring[i][0], yi = ring[i][1];
-        const xj = ring[j][0], yj = ring[j][1];
-        const intersect = ((yi > lat) !== (yj > lat)) &&
-          (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-      }
-      return inside;
-    }
-
-    // Tính sẵn bounding-box cho mỗi Xã trong 1 danh sách (1 Tỉnh) - chỉ tính 1 LẦN
-    // mỗi danh sách (đánh dấu bằng cờ riêng trên chính mảng đó) để loại nhanh phần
-    // lớn ứng viên trước khi chạy ray-casting tốn hơn.
-    function ensureXaListBBoxes(xaList) {
-      if (!xaList || xaList.__bboxReady) return;
-      xaList.forEach(x => {
-        let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
-        x.g.forEach(poly => poly.forEach(ring => ring.forEach(pt => {
-          const lo = pt[0], la = pt[1];
-          if (lo < minLon) minLon = lo; if (lo > maxLon) maxLon = lo;
-          if (la < minLat) minLat = la; if (la > maxLat) maxLat = la;
-        })));
-        x._minLon = minLon; x._maxLon = maxLon; x._minLat = minLat; x._maxLat = maxLat;
-      });
-      xaList.__bboxReady = true;
-    }
-
-    // Tìm Xã/Phường chứa điểm (lat, lon) trong 1 danh sách Xã (của 1 Tỉnh) - trả
-    // về { ma, ten, cap } hoặc null nếu không thuộc Xã nào trong danh sách đó.
-    function findXaAtPointInList(lat, lon, xaList) {
-      if (!xaList) return null;
-      ensureXaListBBoxes(xaList);
-      for (const x of xaList) {
-        if (lon < x._minLon || lon > x._maxLon || lat < x._minLat || lat > x._maxLat) continue;
-        for (const poly of x.g) {
-          if (!poly.length) continue;
-          if (!pointInGeoJSONRing(lon, lat, poly[0])) continue; // phải trong viền ngoài
-          let inHole = false;
-          for (let r = 1; r < poly.length; r++) {
-            if (pointInGeoJSONRing(lon, lat, poly[r])) { inHole = true; break; } // trừ phần lỗ (nếu có)
-          }
-          if (!inHole) return x;
-        }
-      }
-      return null;
-    }
-
-    // Đoán (các) Tỉnh có bounding-box chứa điểm (lat, lon), sắp theo diện tích
-    // bbox tăng dần (Tỉnh nhỏ/khớp hơn thử trước) - thường chỉ ra đúng 1 Tỉnh,
-    // hoạ hoằn ra vài Tỉnh nếu điểm gần biên giới (bbox 2 Tỉnh cạnh nhau chồng lấn).
-    function guessProvinceCandidates(lat, lon) {
-      if (typeof tinhBBoxList === 'undefined') return [];
-      return tinhBBoxList
-        .filter(t => lon >= t.minLon && lon <= t.maxLon && lat >= t.minLat && lat <= t.maxLat)
-        .sort((a, b) => (a.maxLon - a.minLon) * (a.maxLat - a.minLat) - (b.maxLon - b.minLon) * (b.maxLat - b.minLat));
-    }
-
-    // Bấm nút "Dùng vị trí hiện tại của tôi": xin quyền định vị -> đoán Tỉnh theo
-    // bbox -> tải ranh giới Xã của (các) Tỉnh nghi ngờ -> dò chính xác bằng
-    // ray-casting -> tự điền Tỉnh/Xã -> gọi onCommuneInput() để tự động tải bản đồ.
-    async function autoLocateXa() {
-      if (!navigator.geolocation) {
-        showAlert('Trình duyệt không hỗ trợ định vị. Vui lòng chọn Tỉnh/Xã thủ công bên dưới.');
-        return;
-      }
-      const btn = document.getElementById('autoLocateXaBtn');
-      btn.disabled = true;
-      setDriveStatus('Đang xác định vị trí của bạn...');
-
-      navigator.geolocation.getCurrentPosition(
-        async pos => {
-          const lat = pos.coords.latitude, lon = pos.coords.longitude;
-          setDriveStatus('Đang dò Xã/Phường theo vị trí của bạn...');
-          try {
-            await Promise.all([ensureTinhBBoxLoaded(), loadDvhcData()]);
-            const candidates = guessProvinceCandidates(lat, lon);
-            if (!candidates.length) {
-              setDriveStatus('Không xác định được Tỉnh/Xã tại vị trí này. Vui lòng chọn thủ công bên dưới.', true);
-              return;
-            }
-
-            let hit = null;
-            for (const cand of candidates) {
-              setDriveStatus(`Đang dò Xã/Phường trong ${cand.ten}...`);
-              const xaList = await loadXaBoundaryForProvince(cand.maTP);
-              hit = findXaAtPointInList(lat, lon, xaList);
-              if (hit) break;
-            }
-            if (!hit) {
-              setDriveStatus('Không xác định được Xã/Phường tại vị trí này. Vui lòng chọn thủ công bên dưới.', true);
-              return;
-            }
-            const dvhcItem = dvhcData.find(item => item["Mã"] === hit.ma);
-            if (!dvhcItem) {
-              setDriveStatus(`Xác định được vị trí thuộc "${hit.ten}" (mã ${hit.ma}) nhưng không khớp danh mục Tỉnh/Xã. Vui lòng chọn thủ công.`, true);
-              return;
-            }
-            document.getElementById('driveProvinceInput').value = dvhcItem["Tỉnh / Thành Phố"];
-            onProvinceInput();
-            document.getElementById('driveCommuneInput').value = dvhcItem["Tên"];
-            onCommuneInput();
-            showStatus(`✓ Vị trí của bạn thuộc ${dvhcItem["Tên"]}, ${dvhcItem["Tỉnh / Thành Phố"]}`);
-          } catch (e) {
-            setDriveStatus(`Lỗi khi dò Xã/Phường theo vị trí: ${e.message || e}. Vui lòng chọn thủ công.`, true);
-          } finally {
-            btn.disabled = false;
-          }
-        },
-        err => {
-          const msgs = { 1: 'Bị từ chối quyền định vị', 2: 'Không xác định được vị trí', 3: 'Hết thời gian chờ' };
-          setDriveStatus((msgs[err.code] || 'Lỗi định vị') + '. Vui lòng chọn thủ công bên dưới.', true);
-          btn.disabled = false;
-        },
-        { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
-      );
-    }
-
-    // Kiểm tra Tỉnh / Xã đã chọn đúng hay chưa để bật/tắt nút "Tải lại danh sách
-    // bản đồ" tương ứng - bản dành cho người dân KHÔNG cần đăng nhập tài khoản,
-    // chỉ cần chọn đúng Tỉnh/Xã là tự động quét thư mục + file bản đồ công khai.
-    function isDriveFormValid() {
-      const provName = document.getElementById('driveProvinceInput').value.trim();
-      const commName = document.getElementById('driveCommuneInput').value.trim();
-      const commCode = document.getElementById('driveCommuneCodeInput').value.trim();
-      const provOk = !!provName && provincesMap.has(provName);
-      const commOk = !!commName && communesMap.has(commName) && !!commCode;
-      return provOk && commOk;
-    }
-
-    function updateDriveListBtnState() {
-      const btn = document.getElementById('driveListBtn');
-      if (!btn) return;
-      btn.disabled = !isDriveFormValid();
-    }
-
-    function onProvinceInput() {
-      const provName = document.getElementById('driveProvinceInput').value;
-      const provCode = provincesMap.get(provName);
-      const commInput = document.getElementById('driveCommuneInput');
-      const codeInput = document.getElementById('driveCommuneCodeInput');
-      const dlComm = document.getElementById('dlCommunes');
-
-      commInput.value = '';
-      codeInput.value = '';
-      dlComm.innerHTML = '';
-      communesMap.clear();
-
-      // Xóa link thư mục và danh sách file khi đổi tỉnh/thành
-      document.getElementById('driveFolderInput').value = '';
-      document.getElementById('driveFileList').innerHTML = '';
-      const statusEl = document.getElementById('driveStatusMsg');
-      statusEl.textContent = '';
-      statusEl.style.display = 'none';
-
-      if (!provCode) {
-        commInput.disabled = true;
-        updateDriveListBtnState();
-        return;
-      }
-
-      commInput.disabled = false;
-      const filtered = dvhcData.filter(item => item["Mã TP"] === provCode);
-      filtered.sort((a, b) => a["Tên"].localeCompare(b["Tên"]));
-
-      filtered.forEach(item => {
-        communesMap.set(item["Tên"], item["Mã"]);
-        const opt = document.createElement('option');
-        opt.value = item["Tên"];
-        dlComm.appendChild(opt);
-      });
-
-      updateDriveListBtnState();
-    }
-
-    // Chọn xong Xã/Phường -> TỰ ĐỘNG dò thư mục + quét file bản đồ ngay, không cần
-    // đăng nhập tài khoản (bản dành cho người dân, chỉ xem thông tin công khai).
-    function onCommuneInput() {
-      const commName = document.getElementById('driveCommuneInput').value;
-      const commCode = communesMap.get(commName);
-      const codeInput = document.getElementById('driveCommuneCodeInput');
-
-      if (!commCode) {
-        codeInput.value = '';
-        updateDriveListBtnState();
-        return;
-      }
-
-      codeInput.value = commCode;
-
-      // Xóa link thư mục và danh sách file khi chọn xã mới
-      document.getElementById('driveFolderInput').value = '';
-      document.getElementById('driveFileList').innerHTML = '';
-      const statusEl = document.getElementById('driveStatusMsg');
-      statusEl.textContent = '';
-      statusEl.style.display = 'none';
-
-      updateDriveListBtnState();
-
-      const provName = document.getElementById('driveProvinceInput').value.trim();
-      const apiKey = resolveGdriveApiKey('Tdmap' + commCode);
-      document.getElementById('driveApiKeyInput').value = 'Tdmap' + commCode;
-      setDriveStatus('Đang tự động tìm bản đồ của Xã/Phường vừa chọn...');
-      fetchCommuneFolderLink(apiKey, provName, commName, commCode);
-    }
-
-    // Dò tìm ID thư mục Google Drive của Xã (theo cây thư mục Tỉnh > Mã xã),
-    // dùng chung cho cả luồng tự động (nhập mã bí danh Tdmap+mã xã) lẫn luồng
-    // bấm nút "Tải danh sách" thủ công (vì ô Link thư mục đã được ẩn khỏi UI).
+    // Dò tìm ID thư mục Google Drive của Xã Đam Rông 1 (theo cây thư mục Tỉnh > Mã xã).
     async function resolveCommuneFolderId(apiKey, provinceName, communeName, commCode) {
       const rootFolderId = '1D6YJwWRYLi6tsdJl8X2BRav7DGfPFVcK';
 
@@ -4650,75 +4178,25 @@
       return dataComm.files[0].id;
     }
 
-    async function fetchCommuneFolderLink(apiKey, provinceName, communeName, commCode) {
-      setDriveStatus('Đang tự động tìm thư mục trên Google Drive...');
-      try {
-        const commFolderId = await resolveCommuneFolderId(apiKey, provinceName, communeName, commCode);
-        document.getElementById('driveFolderInput').value = `https://drive.google.com/drive/folders/${commFolderId}?usp=drive_link`;
-        setDriveStatus(`Đã tự động tìm thấy link thư mục Xã. Đang lấy file...`);
-
-        // Tự động liệt kê file
-        listDriveGeojsonFiles();
-
-      } catch (e) {
-        setDriveStatus(`Lỗi tự tìm thư mục: ${e.message}`, true);
-      }
-    }
-
-    // silent=true (dùng khi bấm nút chọn xã ở màn hình chào ban đầu): KHÔNG hiện
-    // form chọn Tỉnh/Xã nữa vì đã có mặc định Xã Đam Rông 1 - chỉ hiện thanh tiến
-    // trình tải bản đồ (#fileProgressWrap) cho gọn. Modal chỉ tự bật lên lại nếu
-    // có lỗi xảy ra (xem setDriveStatus) để người dùng tự chọn thủ công.
-    // silent=false (dùng khi bấm nút "Chọn xã" để đổi Xã/Phường khác sau khi bản
-    // đồ đã tải xong): hiện đầy đủ form như trước.
-    function openDriveModal(silent) {
-      document.getElementById('driveApiKeyInput').value = '';
-      document.getElementById('driveFolderInput').value = localStorage.getItem(GDRIVE_FOLDER_STORAGE) || GDRIVE_DEFAULT_FOLDER;
+    // silent=true (dùng khi bấm biểu tượng bản đồ ở màn hình chào ban đầu): KHÔNG
+    // hiện modal, chỉ hiện thanh tiến trình tải bản đồ (#fileProgressWrap) cho
+    // gọn. Modal chỉ tự bật lên nếu có lỗi xảy ra (xem setDriveStatus).
+    // silent=false (dùng khi bấm nút "Tải lại bản đồ"): hiện modal kèm trạng thái.
+    async function loadDamRong1Map(silent) {
       document.getElementById('driveFileList').innerHTML = '';
-      document.getElementById('autoLocateXaBtn').disabled = false;
       setDriveStatus('');
-      updateDriveListBtnState();
       if (silent) {
         FileProgress.start('Đang tải bản đồ Xã Đam Rông 1...');
       } else {
         document.getElementById('driveModalOverlay').classList.add('show');
       }
-
-      // Tự động khôi phục Xã/Phường đã chọn lần trước (nếu có) và quét lại bản đồ
-      // ngay, không cần người dùng chọn lại từ đầu mỗi lần mở web.
-      loadDvhcData().then(() => {
-        const savedProv = localStorage.getItem('tdmap_prov_v1') || DEFAULT_PROVINCE;
-        const savedComm = localStorage.getItem('tdmap_comm_v1') || DEFAULT_COMMUNE;
-        if (savedProv) {
-          document.getElementById('driveProvinceInput').value = savedProv;
-          onProvinceInput();
-          if (savedComm) {
-            document.getElementById('driveCommuneInput').value = savedComm;
-            onCommuneInput();
-          }
-        }
-      });
+      await listDriveGeojsonFiles();
     }
 
     function closeDriveModal() {
       document.getElementById('driveModalOverlay').classList.remove('show');
     }
-    function clearDriveSettings() {
-      localStorage.removeItem(GDRIVE_FOLDER_STORAGE);
-      localStorage.removeItem(GDRIVE_KEY_STORAGE);
-      localStorage.removeItem('tdmap_prov_v1');
-      localStorage.removeItem('tdmap_comm_v1');
-      document.getElementById('driveApiKeyInput').value = '';
-      document.getElementById('driveFolderInput').value = GDRIVE_DEFAULT_FOLDER;
-      document.getElementById('driveProvinceInput').value = '';
-      document.getElementById('driveCommuneInput').value = '';
-      document.getElementById('driveCommuneCodeInput').value = '';
-      document.getElementById('dlCommunes').innerHTML = '';
-      document.getElementById('driveFileList').innerHTML = '';
-      setDriveStatus('');
-      updateDriveListBtnState();
-      showStatus('Đã xóa thiết lập Xã/Phường đã lưu');
-    }
+
     function setDriveStatus(msg, isError, isHtml = false) {
       const el = document.getElementById('driveStatusMsg');
       if (!msg) { el.style.display = 'none'; el.innerHTML = ''; return; }
@@ -4730,54 +4208,37 @@
       }
       el.classList.toggle('error', !!isError);
       // Nếu đang tải ngầm (silent, modal đang ẩn) mà gặp lỗi thì tự bật modal
-      // lên lại để người dùng thấy lỗi và tự chọn Tỉnh/Xã thủ công, tránh bị
-      // "kẹt" ở thanh tiến trình mà không rõ chuyện gì xảy ra.
+      // lên lại để người dùng thấy lỗi, tránh bị "kẹt" ở thanh tiến trình mà
+      // không rõ chuyện gì xảy ra.
       if (isError) {
         document.getElementById('driveModalOverlay').classList.add('show');
       }
     }
 
+    // Quét thư mục Drive của Xã Đam Rông 1, liệt kê các file .geojson và tự động
+    // mở bản có ngày sửa mới nhất; danh sách vẫn hiện để mở lại bản khác nếu muốn.
     async function listDriveGeojsonFiles() {
-      const provName = document.getElementById('driveProvinceInput').value.trim();
-      const commName = document.getElementById('driveCommuneInput').value.trim();
-      const commCode = document.getElementById('driveCommuneCodeInput').value.trim();
-      const apiKeyRaw = document.getElementById('driveApiKeyInput').value.trim();
-      const apiKey = resolveGdriveApiKey(apiKeyRaw);
-      let folderUrl = document.getElementById('driveFolderInput').value.trim();
-      const remember = document.getElementById('driveRememberChk').checked;
+      const apiKey = resolveGdriveApiKey('Tdmap' + DEFAULT_COMMUNE_CODE);
       const listBtn = document.getElementById('driveListBtn');
       const listEl = document.getElementById('driveFileList');
       listEl.innerHTML = '';
-
-      // Vì ô "Link thư mục Google Drive" và "Google API Key" đã ẩn khỏi giao diện,
-      // hàm này tự dò thư mục tương ứng ngầm theo Tỉnh/Xã đã chọn (không cần đăng
-      // nhập tài khoản - bản dành cho người dân).
-      if (!provName || !provincesMap.has(provName)) { setDriveStatus('Vui lòng chọn đúng Tỉnh/Thành trong danh sách gợi ý.', true); return; }
-      if (!commName || !communesMap.has(commName) || !commCode) { setDriveStatus('Vui lòng chọn đúng Xã/Phường trong danh sách gợi ý.', true); return; }
-      if (!apiKey) { setDriveStatus('Không xác định được dữ liệu bản đồ của Xã/Phường này.', true); return; }
-
       listBtn.disabled = true;
 
+      let folderUrl = document.getElementById('driveFolderInput').value.trim()
+        || localStorage.getItem(GDRIVE_FOLDER_STORAGE) || '';
       let folderId = extractDriveFolderId(folderUrl);
       if (!folderId) {
         setDriveStatus('Đang tự động tìm thư mục trên Google Drive...');
         try {
-          folderId = await resolveCommuneFolderId(apiKey, provName, commName, commCode);
+          folderId = await resolveCommuneFolderId(apiKey, DEFAULT_PROVINCE, DEFAULT_COMMUNE, DEFAULT_COMMUNE_CODE);
           folderUrl = `https://drive.google.com/drive/folders/${folderId}?usp=drive_link`;
           document.getElementById('driveFolderInput').value = folderUrl;
+          localStorage.setItem(GDRIVE_FOLDER_STORAGE, folderUrl);
         } catch (e) {
-          setDriveStatus(`Không tìm thấy thư mục tương ứng: ${e.message}`, true);
+          setDriveStatus(`Không tìm thấy thư mục bản đồ Xã Đam Rông 1: ${e.message}`, true);
           listBtn.disabled = false;
-          updateDriveListBtnState();
           return;
         }
-      }
-
-      if (remember) {
-        localStorage.setItem(GDRIVE_FOLDER_STORAGE, folderUrl);
-        localStorage.setItem(GDRIVE_KEY_STORAGE, apiKeyRaw);
-        localStorage.setItem('tdmap_prov_v1', provName);
-        localStorage.setItem('tdmap_comm_v1', commName);
       }
 
       setDriveStatus('Đang tải danh sách file từ Google Drive...');
@@ -4827,7 +4288,7 @@
               : '<span class="dfi-go">Mở ▸</span>';
           item.innerHTML = `<span class="dfi-icon">🗺️</span><span class="dfi-name"></span>${badge}`;
           item.querySelector('.dfi-name').textContent = f.name;
-          item.onclick = () => openDriveFile(f.id, f.name, apiKey, f.size, f.modifiedTime, commCode);
+          item.onclick = () => openDriveFile(f.id, f.name, apiKey, f.size, f.modifiedTime, DEFAULT_COMMUNE_CODE);
           listEl.appendChild(item);
         }
 
@@ -4835,11 +4296,11 @@
         // xếp ở trên) - người dân không cần tự bấm chọn, danh sách phía trên vẫn
         // còn đó để mở bản khác nếu muốn.
         const newest = sorted[0];
-        openDriveFile(newest.id, newest.name, apiKey, newest.size, newest.modifiedTime, commCode);
+        openDriveFile(newest.id, newest.name, apiKey, newest.size, newest.modifiedTime, DEFAULT_COMMUNE_CODE);
       } catch (err) {
         setDriveStatus(`Lỗi khi kết nối Google Drive: ${err.message || err}`, true);
       } finally {
-        updateDriveListBtnState();
+        listBtn.disabled = false;
       }
     }
 
