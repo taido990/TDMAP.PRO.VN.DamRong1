@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 280826v3  -->
+  <!-- 280826v4  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -1788,8 +1788,6 @@
           <polygon points="6,88 94,88 50,60" fill="#FFBA00" />
         </svg> Bản đồ Xã Đam Rông 1</div>
       <div class="modal-body">
-        <input class="drive-input" id="driveFolderInput" type="text" style="display:none;">
-
         <button id="driveListBtn" onclick="loadDamRong1Map(false)">🔄 Tải lại bản đồ</button>
         <div id="driveStatusMsg" style="display:none;"></div>
         <div id="driveFileList"></div>
@@ -4090,7 +4088,6 @@
     // không có tính năng chọn Xã/Phường khác. Ghi chú: Google Drive API v3 luôn
     // cần một API Key hợp lệ để liệt kê/tải nội dung file bằng JavaScript phía
     // trình duyệt — kể cả khi thư mục đã ở chế độ "Bất kỳ ai có đường liên kết".
-    const GDRIVE_FOLDER_STORAGE = 'tdmap_gdrive_folder_v1';
     // KHÔNG gắn cứng API Key thật (dạng "AIzaSy...") vào code (file này có thể bị
     // đẩy lên kho GitHub công khai -> lộ key ngay lập tức, bị secret-scanning
     // quét ra). Thay vào đó dùng BÍ DANH NGẮN (Tdmap+mã xã), code tự tra ra key
@@ -4124,59 +4121,13 @@
       return v;
     }
 
-    const DEFAULT_PROVINCE = 'Tỉnh Lâm Đồng';
-    const DEFAULT_COMMUNE = 'Xã Đam Rông 1';
     const DEFAULT_COMMUNE_CODE = '24886'; // ứng với thư mục Drive .../CSDL2026/Tỉnh Lâm Đồng/24886
-
-    function extractDriveFolderId(url) {
-      if (!url) return null;
-      const s = url.trim();
-      // Chấp nhận cả link đầy đủ (folders/ID) lẫn khi người dùng dán thẳng ID.
-      const m = s.match(/\/folders\/([a-zA-Z0-9_-]+)/) || s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (m) return m[1];
-      if (/^[a-zA-Z0-9_-]{15,}$/.test(s)) return s; // có thể người dùng dán thẳng ID
-      return null;
-    }
-
-    // Dò tìm ID thư mục Google Drive của Xã Đam Rông 1 (theo cây thư mục Tỉnh > Mã xã).
-    async function resolveCommuneFolderId(apiKey, provinceName, communeName, commCode) {
-      const rootFolderId = '1D6YJwWRYLi6tsdJl8X2BRav7DGfPFVcK';
-
-      // 1. Tìm thư mục Tỉnh
-      let qProv = `name = '${provinceName.replace(/'/g, "\\'")}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolderId}' in parents and trashed = false`;
-      let resProv = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(qProv)}&key=${apiKey}&fields=files(id,name)`);
-      let dataProv = await resProv.json();
-      if (!resProv.ok) throw new Error(dataProv.error?.message || 'Lỗi tìm thư mục Tỉnh');
-
-      if (!dataProv.files || dataProv.files.length === 0) {
-        let cleanProv = provinceName.replace(/'/g, "\\'").replace(/^(Tỉnh|Thành phố)\s+/i, '');
-        let qProvFall = `name contains '${cleanProv}' and mimeType = 'application/vnd.google-apps.folder' and '${rootFolderId}' in parents and trashed = false`;
-        resProv = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(qProvFall)}&key=${apiKey}&fields=files(id,name)`);
-        dataProv = await resProv.json();
-        if (!dataProv.files || dataProv.files.length === 0) {
-          throw new Error(`Không tìm thấy thư mục Tỉnh tương ứng: ${provinceName}`);
-        }
-      }
-      const provFolderId = dataProv.files[0].id;
-
-      // 2. Tìm thư mục Xã (Thư mục Xã được đặt tên bằng MÃ XÃ, ví dụ: 24301)
-      let qComm = `name = '${commCode}' and mimeType = 'application/vnd.google-apps.folder' and '${provFolderId}' in parents and trashed = false`;
-      let resComm = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(qComm)}&key=${apiKey}&fields=files(id,name)`);
-      let dataComm = await resComm.json();
-      if (!resComm.ok) throw new Error(dataComm.error?.message || 'Lỗi tìm thư mục Xã');
-
-      if (!dataComm.files || dataComm.files.length === 0) {
-        // Fallback: Thử tìm theo tên xã (trường hợp thư mục không đặt theo mã xã)
-        let cleanComm = communeName.replace(/'/g, "\\'").replace(/^(Xã|Phường|Thị trấn)\s+/i, '');
-        let qCommFall = `name contains '${cleanComm}' and mimeType = 'application/vnd.google-apps.folder' and '${provFolderId}' in parents and trashed = false`;
-        resComm = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(qCommFall)}&key=${apiKey}&fields=files(id,name)`);
-        dataComm = await resComm.json();
-        if (!dataComm.files || dataComm.files.length === 0) {
-          throw new Error(`Không tìm thấy thư mục Xã (mã ${commCode} hoặc tên ${communeName})`);
-        }
-      }
-      return dataComm.files[0].id;
-    }
+    // ID THƯ MỤC GOOGLE DRIVE CỦA XÃ ĐAM RÔNG 1 - lấy trực tiếp từ đường link thư
+    // mục thật (.../CSDL2026/Tỉnh Lâm Đồng/24886), KHÔNG dò theo tên Tỉnh/Xã như
+    // trước nữa. Trỏ thẳng vào đúng 1 ID này đảm bảo TUYỆT ĐỐI chỉ quét/mở file
+    // trong đúng thư mục này - không còn khả năng dò nhầm sang thư mục Tỉnh/Xã
+    // khác do trùng/gần giống tên.
+    const DEFAULT_FOLDER_ID = '1uvmrc8skSOjNuLqB-Jpyy0puGNDmkLJi';
 
     // silent=true (dùng khi bấm biểu tượng bản đồ ở màn hình chào ban đầu): KHÔNG
     // hiện modal, chỉ hiện thanh tiến trình tải bản đồ (#fileProgressWrap) cho
@@ -4224,23 +4175,7 @@
       listEl.innerHTML = '';
       listBtn.disabled = true;
 
-      let folderUrl = document.getElementById('driveFolderInput').value.trim()
-        || localStorage.getItem(GDRIVE_FOLDER_STORAGE) || '';
-      let folderId = extractDriveFolderId(folderUrl);
-      if (!folderId) {
-        setDriveStatus('Đang tự động tìm thư mục trên Google Drive...');
-        try {
-          folderId = await resolveCommuneFolderId(apiKey, DEFAULT_PROVINCE, DEFAULT_COMMUNE, DEFAULT_COMMUNE_CODE);
-          folderUrl = `https://drive.google.com/drive/folders/${folderId}?usp=drive_link`;
-          document.getElementById('driveFolderInput').value = folderUrl;
-          localStorage.setItem(GDRIVE_FOLDER_STORAGE, folderUrl);
-        } catch (e) {
-          setDriveStatus(`Không tìm thấy thư mục bản đồ Xã Đam Rông 1: ${e.message}`, true);
-          listBtn.disabled = false;
-          return;
-        }
-      }
-
+      const folderId = DEFAULT_FOLDER_ID;
       setDriveStatus('Đang tải danh sách file từ Google Drive...');
 
       try {
