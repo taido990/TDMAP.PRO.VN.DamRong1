@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 280826v6  -->
+  <!-- 300826  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -794,6 +794,163 @@
       pointer-events: none;
     }
 
+    /* NÚT CTA: ĐĂNG KÝ THỬA ĐẤT - đặt riêng, nổi bật hơn hàng btn-row phía dưới
+       (Copy/Chụp ảnh/Chỉ đường) vì đây là hành động chính người dân cần làm. */
+    #btnRegister {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 8px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7c4dff, #5e35b1);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: filter .15s, transform .1s;
+    }
+
+    #btnRegister:active {
+      filter: brightness(.85);
+      transform: scale(.98);
+    }
+
+    /* FORM HỘP THOẠI ĐĂNG KÝ */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .form-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 10px;
+      border: 1px solid #dde2e5;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: #222;
+      background: #fafcfc;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #00c6a7;
+      background: #fff;
+    }
+
+    /* HỘP THOẠI: GIẤY TỜ KÈM THEO KHI ĐI ĐĂNG KÝ ĐẤT ĐAI (2 cột) */
+    .docs-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #00c6a7;
+      margin-bottom: 12px;
+    }
+
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .docs-col {
+      background: #f7fafa;
+      border: 1px solid #e6eeed;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .docs-col h4 {
+      margin: 0 0 8px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #1a6fd4;
+      line-height: 1.4;
+    }
+
+    .docs-subtitle {
+      font-weight: 600;
+      color: #777;
+      font-size: 11.5px;
+    }
+
+    .docs-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .docs-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12.5px;
+      color: #444;
+      line-height: 1.5;
+      margin-bottom: 7px;
+    }
+
+    .docs-ico {
+      flex-shrink: 0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* Dòng cha có danh sách con bên trong (vd "Giấy tờ về nguồn gốc đất...") -
+       chuyển về block để danh sách con XUỐNG HÀNG bên dưới thay vì bị đẩy nằm
+       ngang bên cạnh do li cha vốn là flex row. */
+    .docs-list li.docs-parent {
+      display: block;
+    }
+
+    .docs-list li.docs-parent>.docs-ico {
+      margin-right: 6px;
+    }
+
+    .docs-sublist {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0 0 0 22px;
+      /* thụt vào bên phải, thẳng hàng dưới phần chữ của dòng cha */
+    }
+
+    .docs-sublist li {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .docs-note {
+      background: #fff4d6;
+      border: 1px solid #ffdf99;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .docs-note-title {
+      font-weight: 800;
+      font-size: 12.5px;
+      color: #7a5200;
+      margin-bottom: 8px;
+    }
+
+    .docs-note .docs-list li {
+      color: #7a5200;
+    }
+
     /* NÚT: LINK HSQ XÃ (ngoài danh sách thửa trong file KML/GeoJSON) - cùng hàng với labelZoomControl */
     #hsqXaBtn {
       display: flex;
@@ -1307,12 +1464,15 @@
     #customAlertBox {
       background: #fff;
       width: 90%;
-      max-width: 320px;
+      max-width: 360px;
+      max-height: 82vh;
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       transform: scale(0.9);
       transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     #customAlertOverlay.show #customAlertBox {
@@ -1327,6 +1487,7 @@
       color: #00c6a7;
       border-bottom: 1px solid #eaeaea;
       letter-spacing: 0.5px;
+      flex-shrink: 0;
     }
 
     #customAlertBody {
@@ -1335,12 +1496,16 @@
       color: #444;
       line-height: 1.6;
       white-space: pre-wrap;
+      overflow-y: auto;
+      flex: 1;
     }
 
     #customAlertFooter {
       padding: 12px 18px 18px;
       display: flex;
       justify-content: flex-end;
+      flex-shrink: 0;
+      border-top: 1px solid #f0f0f0;
     }
 
     #customAlertBtn {
@@ -1696,6 +1861,7 @@
       <div id="popupNote">📌 Chủ sử dụng đất vui lòng ghi lại <b>Số tờ, Số thửa</b> hoặc nhấn vào nút (Chụp ảnh
         thửa được chọn) để cung cấp cho đơn vị đo đạc thực hiện đăng ký đất đai.</div>
     </div>
+    <button id="btnRegister" onclick="openRegisterOverlay()">📝 Đăng ký thửa đất này</button>
     <div class="btn-row">
       <a id="btnCopyInfo" class="btn-copy" href="#" onclick="event.preventDefault(); copyParcelInfo();">
         <span class="ico">📋</span> Copy thông tin
@@ -1794,6 +1960,113 @@
       </div>
       <div class="modal-footer">
         <button class="modal-btn secondary" onclick="closeDriveModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HỘP THOẠI: ĐĂNG KÝ THỬA ĐẤT - nhập Tên chủ + SĐT, gửi vào Google Sheet
+       qua Apps Script Web App (xem REGISTER_WEBAPP_URL trong <script> bên dưới). -->
+  <div id="registerOverlay" class="modal-overlay">
+    <div class="modal-box" style="max-width:340px;">
+      <div class="modal-header">📝 Đăng ký thửa đất</div>
+      <div class="modal-body">
+        <div id="registerParcelInfo"
+          style="background:#f2f7f6;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;color:#333;margin-bottom:12px;">
+          Tờ: –, Thửa: –</div>
+        <div class="form-group">
+          <label class="form-label">Tên chủ sử dụng đất <span style="color:#d9534f;">*</span></label>
+          <input id="regTenChu" class="form-input" type="text" placeholder="Nguyễn Văn A" maxlength="120"
+            autocomplete="name">
+        </div>
+        <div class="form-group" style="margin-bottom:4px;">
+          <label class="form-label">Số điện thoại <span style="color:#d9534f;">*</span></label>
+          <input id="regSdt" class="form-input" type="tel" placeholder="09xxxxxxxx" maxlength="15"
+            autocomplete="tel">
+        </div>
+        <div id="registerErrorMsg" style="display:none;color:#d9534f;font-size:12px;margin-top:6px;line-height:1.5;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeRegisterOverlay()">Huỷ</button>
+        <button id="regSubmitBtn" class="modal-btn primary" style="background:#00a884;"
+          onclick="submitRegister()">Gửi đăng ký</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HỘP THOẠI: CẢNH BÁO TRÙNG TỜ-THỬA - hiện khi Tờ/Thửa đang đăng ký đã có
+       người đăng ký trước đó (kiểm tra qua REGISTER_WEBAPP_URL?action=check). -->
+  <div id="registerDuplicateOverlay" class="modal-overlay">
+    <div class="modal-box" style="max-width:340px;">
+      <div class="modal-header">⚠️ Thửa đã có người đăng ký</div>
+      <div class="modal-body">
+        <div id="dupConfirmMsg" style="line-height:1.6;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeDuplicateConfirmOverlay()">Huỷ</button>
+        <button class="modal-btn" style="background:#f0ad4e;" onclick="confirmDuplicateRegister()">Vẫn đăng ký</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HỘP THOẠI: XÁC NHẬN GỬI ĐĂNG KÝ - hiện trước khi thật sự gửi (trường hợp
+       Tờ-Thửa CHƯA có ai đăng ký; trường hợp trùng đã tự có bước xác nhận riêng
+       ở registerDuplicateOverlay nên không hỏi lại 2 lần). -->
+  <div id="registerConfirmOverlay" class="modal-overlay">
+    <div class="modal-box" style="max-width:340px;">
+      <div class="modal-header">📝 Xác nhận gửi đăng ký</div>
+      <div class="modal-body">
+        <div id="confirmSendMsg" style="line-height:1.6;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeConfirmSendOverlay()">Huỷ</button>
+        <button class="modal-btn primary" style="background:#00a884;"
+          onclick="confirmSendRegister()">Đồng ý, gửi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HỘP THOẠI: GIẤY TỜ KÈM THEO KHI ĐI ĐĂNG KÝ ĐẤT ĐAI - hiện sau khi gửi đăng
+       ký thành công. Rộng hơn modal-box thường (2 cột trên màn hình đủ rộng, tự
+       dồn về 1 cột trên điện thoại nhờ auto-fit/minmax). -->
+  <div id="requiredDocsOverlay" class="modal-overlay">
+    <div class="modal-box" style="max-width:640px;">
+      <div class="modal-header">✅ <span id="docsSuccessMsg">Đã gửi đăng ký</span></div>
+      <div class="modal-body">
+        <div class="docs-title">📋 Giấy tờ kèm theo khi đi đăng ký đất đai</div>
+        <div class="docs-grid">
+          <div class="docs-col">
+            <h4>1️⃣ Đất CHƯA được cấp giấy chứng nhận<br><span class="docs-subtitle">(đăng ký lần đầu)</span></h4>
+            <ul class="docs-list">
+              <li><span class="docs-ico">🪪</span> CCCD chủ sử dụng đất (chủ 1 + chủ 2, nếu có)</li>
+              <li class="docs-parent"><span class="docs-ico">📜</span> Giấy tờ về nguồn gốc đất (1 trong các loại sau):
+                <ul class="docs-sublist">
+                  <li><span class="docs-ico">🤝</span> Giấy tờ mua bán, chuyển nhượng</li>
+                  <li><span class="docs-ico">🎁</span> Giấy tờ nhận tặng cho, thừa kế</li>
+                  <li><span class="docs-ico">🏛️</span> Quyết định giao đất/cấp đất của Nhà nước</li>
+                  <li><span class="docs-ico">📄</span> Giấy tờ khác chứng minh nguồn gốc sử dụng đất (kê khai 299, sổ mục kê, biên lai thuế đất...)</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="docs-col">
+            <h4>2️⃣ Đất ĐÃ được cấp giấy chứng nhận<br><span class="docs-subtitle">(đăng ký biến động, cấp đổi...)</span></h4>
+            <ul class="docs-list">
+              <li><span class="docs-ico">🪪</span> CCCD chủ sử dụng đất (chủ 1 + chủ 2, nếu có)</li>
+              <li><span class="docs-ico">📗</span> Giấy chứng nhận quyền sử dụng đất</li>
+            </ul>
+          </div>
+        </div>
+        <div class="docs-note">
+          <div class="docs-note-title">💡 Lưu ý chung</div>
+          <ul class="docs-list">
+            <li><span class="docs-ico">📷</span> Photo tất cả giấy tờ liên quan (CCCD, giấy tờ nguồn gốc/GCN...)</li>
+            <li><span class="docs-ico">🔍</span> Mang theo bản gốc để đối chiếu</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn primary" style="background:#1a6fd4;" onclick="closeRequiredDocsOverlay()">Đã hiểu</button>
       </div>
     </div>
   </div>
@@ -1959,6 +2232,17 @@
     }
     function closeAlert() {
       document.getElementById('customAlertOverlay').classList.remove('show');
+    }
+
+    // Hộp thoại riêng (2 cột, có icon) hiện sau khi gửi đăng ký thành công, thay
+    // cho showAlert() dạng text thuần - vì nội dung giấy tờ cần trình bày dạng
+    // danh sách/bảng chứ không hợp với 1 khối văn bản đơn giản.
+    function openRequiredDocsOverlay(successMsg) {
+      document.getElementById('docsSuccessMsg').textContent = successMsg;
+      document.getElementById('requiredDocsOverlay').classList.add('show');
+    }
+    function closeRequiredDocsOverlay() {
+      document.getElementById('requiredDocsOverlay').classList.remove('show');
     }
 
     // ── LOCATE ───────────────────────────────────────────────────────────────────
@@ -3313,6 +3597,224 @@
         openCopyInfoOverlay(text);
       } catch (e) {
         showStatus('Không sao chép được (trình duyệt chặn quyền clipboard)');
+      }
+    }
+
+    // ── ĐĂNG KÝ THỬA ĐẤT (ghi vào Google Sheet qua Apps Script Web App) ────────────
+    // Cách hoạt động: hộp thoại lấy Tên chủ + SĐT do người dân nhập, ghép với
+    // Tờ/Thửa/Toạ độ của thửa đang mở (activeP), rồi POST (form-urlencoded, chế độ
+    // 'no-cors' vì Apps Script không trả CORS header) tới URL Web App bên dưới.
+    // Web App (doPost) tự ghi thêm 1 dòng vào Google Sheet.
+    //
+    // BẮT BUỘC PHẢI TỰ TRIỂN KHAI Apps Script rồi dán URL vào đây thì tính năng
+    // này mới hoạt động - xem hướng dẫn trong file AppsScript_DangKyThua.gs.
+    const REGISTER_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxgY4-dgmOOlaRuNY3A-9Jb3AtOzDuFy7koNO7Jl_YFnUzTU_YN-l4irRe87rMng6JTiw/exec';
+
+    const REGISTER_PENDING_KEY = 'tdmap_pendingRegistrations';
+
+    function openRegisterOverlay() {
+      if (!activeP) return;
+      const [toNum, thuaNum] = activeP.id.split('-');
+      document.getElementById('registerParcelInfo').textContent = `Tờ: ${toNum}, Thửa: ${thuaNum}`;
+      document.getElementById('regTenChu').value = '';
+      document.getElementById('regSdt').value = '';
+      const errEl = document.getElementById('registerErrorMsg');
+      errEl.style.display = 'none';
+      errEl.textContent = '';
+      document.getElementById('registerOverlay').classList.add('show');
+    }
+
+    function closeRegisterOverlay() {
+      document.getElementById('registerOverlay').classList.remove('show');
+    }
+
+    // Chấp nhận số VN 10 số (bắt đầu 03/05/07/08/09) hoặc dạng +84, cho phép
+    // người dùng gõ kèm khoảng trắng/dấu gạch ngang.
+    function isValidVNPhone(raw) {
+      const digits = raw.replace(/[\s.-]/g, '');
+      return /^(0|\+84)(3|5|7|8|9)\d{8}$/.test(digits);
+    }
+
+    function readPendingRegistrations() {
+      try {
+        return JSON.parse(localStorage.getItem(REGISTER_PENDING_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function writePendingRegistrations(list) {
+      try {
+        localStorage.setItem(REGISTER_PENDING_KEY, JSON.stringify(list));
+      } catch (e) { /* localStorage đầy/bị chặn - bỏ qua, không có gì để làm thêm */ }
+    }
+
+    // Gửi 1 payload tới Apps Script. mode:'no-cors' khiến trình duyệt KHÔNG cho
+    // đọc nội dung phản hồi, nhưng promise chỉ reject khi thật sự lỗi mạng (mất
+    // mạng/URL sai/bị chặn) - dùng đó làm tín hiệu thành công/thất bại tốt nhất
+    // có thể trong điều kiện không đọc được response.
+    async function postRegistration(payload) {
+      await fetch(REGISTER_WEBAPP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: new URLSearchParams(payload)
+      });
+    }
+
+    // Gửi lại các đăng ký đã lưu tạm trên máy (do lúc gửi bị mất mạng) - gọi khi
+    // vừa mở lại trang VÀ mỗi khi máy có mạng trở lại (sự kiện 'online').
+    async function flushPendingRegistrations() {
+      if (!REGISTER_WEBAPP_URL || REGISTER_WEBAPP_URL === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') return;
+      const pending = readPendingRegistrations();
+      if (!pending.length) return;
+      const stillPending = [];
+      for (const item of pending) {
+        try {
+          await postRegistration(item);
+        } catch (e) {
+          stillPending.push(item);
+        }
+      }
+      writePendingRegistrations(stillPending);
+      if (stillPending.length < pending.length) {
+        showStatus(`✓ Đã tự động gửi ${pending.length - stillPending.length} đăng ký lưu tạm trước đó`);
+      }
+    }
+    window.addEventListener('load', flushPendingRegistrations);
+    window.addEventListener('online', flushPendingRegistrations);
+
+    // Hỏi Apps Script xem Tờ/Thửa này đã có ai đăng ký trước chưa (đọc được nội
+    // dung phản hồi nên KHÔNG dùng mode:'no-cors' như postRegistration - GET tới
+    // Apps Script vẫn đọc được response bình thường qua fetch). Lỗi mạng/không rõ
+    // -> coi như "chưa rõ", KHÔNG chặn đăng ký (trả về null).
+    async function checkDuplicateParcel(to, thua) {
+      try {
+        const url = `${REGISTER_WEBAPP_URL}?action=check&to=${encodeURIComponent(to)}&thua=${encodeURIComponent(thua)}`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return (data && data.found) ? data : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function closeDuplicateConfirmOverlay() {
+      document.getElementById('registerDuplicateOverlay').classList.remove('show');
+      __pendingRegisterPayload = null;
+      __pendingRegisterMeta = null;
+    }
+
+    let __pendingRegisterPayload = null;
+    let __pendingRegisterMeta = null;
+
+    async function confirmDuplicateRegister() {
+      document.getElementById('registerDuplicateOverlay').classList.remove('show');
+      const payload = __pendingRegisterPayload, meta = __pendingRegisterMeta;
+      __pendingRegisterPayload = null;
+      __pendingRegisterMeta = null;
+      if (!payload) return;
+      await doSubmitRegistration(payload, meta);
+    }
+
+    async function submitRegister() {
+      if (!activeP) return;
+      const tenChu = document.getElementById('regTenChu').value.trim();
+      const sdt = document.getElementById('regSdt').value.trim();
+      const errEl = document.getElementById('registerErrorMsg');
+
+      if (!tenChu) {
+        errEl.textContent = 'Vui lòng nhập tên chủ sử dụng đất.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (!isValidVNPhone(sdt)) {
+        errEl.textContent = 'Số điện thoại không hợp lệ (vd: 0912345678).';
+        errEl.style.display = 'block';
+        return;
+      }
+      errEl.style.display = 'none';
+
+      if (!REGISTER_WEBAPP_URL || REGISTER_WEBAPP_URL === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+        errEl.textContent = 'Chưa cấu hình nơi lưu dữ liệu (REGISTER_WEBAPP_URL) - liên hệ quản trị hệ thống.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      const [toNum, thuaNum] = activeP.id.split('-');
+      const payload = {
+        xa: 'Đam Rông 1',
+        to: toNum || '',
+        thua: thuaNum || '',
+        tenChu,
+        sdt,
+        lat: activeP.lat != null ? activeP.lat : '',
+        lng: activeP.lon != null ? activeP.lon : '',
+        ghiChu: '',
+        linkMaps: (activeP.lat != null && activeP.lon != null)
+          ? `https://www.google.com/maps?q=${activeP.lat},${activeP.lon}` : ''
+      };
+      const meta = { toNum, thuaNum, tenChu };
+
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Đang kiểm tra...';
+      const dup = await checkDuplicateParcel(toNum, thuaNum);
+      btn.disabled = false;
+      btn.textContent = 'Gửi đăng ký';
+
+      if (dup) {
+        __pendingRegisterPayload = payload;
+        __pendingRegisterMeta = meta;
+        document.getElementById('dupConfirmMsg').textContent =
+          `Thửa Tờ ${toNum}, Thửa ${thuaNum} đã có người đăng ký trước đó. ` +
+          `Bạn có chắc chắn muốn đăng ký (thêm) không?`;
+        document.getElementById('registerDuplicateOverlay').classList.add('show');
+        return;
+      }
+
+      // Chưa trùng - vẫn hỏi lại 1 lần trước khi thật sự gửi, tránh gửi nhầm do
+      // lỡ tay bấm khi chưa kiểm tra kỹ thông tin vừa nhập.
+      __pendingRegisterPayload = payload;
+      __pendingRegisterMeta = meta;
+      document.getElementById('confirmSendMsg').textContent =
+        `Bạn có muốn gửi đơn đăng ký thửa Tờ ${toNum}, Thửa ${thuaNum} cho chủ "${tenChu}", SĐT ${sdt} không?`;
+      document.getElementById('registerConfirmOverlay').classList.add('show');
+    }
+
+    function closeConfirmSendOverlay() {
+      document.getElementById('registerConfirmOverlay').classList.remove('show');
+      __pendingRegisterPayload = null;
+      __pendingRegisterMeta = null;
+    }
+
+    async function confirmSendRegister() {
+      document.getElementById('registerConfirmOverlay').classList.remove('show');
+      const payload = __pendingRegisterPayload, meta = __pendingRegisterMeta;
+      __pendingRegisterPayload = null;
+      __pendingRegisterMeta = null;
+      if (!payload) return;
+      await doSubmitRegistration(payload, meta);
+    }
+
+    async function doSubmitRegistration(payload, meta) {
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Đang gửi...';
+      try {
+        await postRegistration(payload);
+        closeRegisterOverlay();
+        openRequiredDocsOverlay(`Đã gửi đăng ký thửa Tờ ${meta.toNum}, Thửa ${meta.thuaNum} cho chủ "${meta.tenChu}". Cảm ơn bạn!`);
+      } catch (e) {
+        // Mất mạng/không gửi được ngay - lưu tạm trên máy, tự động gửi lại sau.
+        const pending = readPendingRegistrations();
+        pending.push(payload);
+        writePendingRegistrations(pending);
+        closeRegisterOverlay();
+        showAlert('Không có kết nối mạng lúc này. Đăng ký đã được lưu tạm trên máy và sẽ TỰ ĐỘNG gửi đi khi có mạng trở lại - không cần đăng ký lại.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Gửi đăng ký';
       }
     }
 
