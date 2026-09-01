@@ -1,6 +1,6 @@
 {
-  "name": "TDMAP.PRO.VN",
-  "short_name": "TDMAP",
+  "name": "TDMAP_DamRong1",
+  "short_name": "TDMAP_DamRong1",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
