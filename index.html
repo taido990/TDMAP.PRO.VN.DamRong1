@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 300826  -->
+  <!-- 310826  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -17,8 +17,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TDMAP">
-  <meta name="application-name" content="TDMAP">
+  <meta name="apple-mobile-web-app-title" content="TDMAP_DamRong1">
+  <meta name="application-name" content="TDMAP_DamRong1">
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -169,10 +169,12 @@
     #searchSuggestions {
       position: fixed;
       top: 153px;
-      left: 15px;
+      /* left lệch qua phải hơn labelZoomControl (cụm nút mức zoom 16/17/18/19,
+         left:12px, rộng ~34px) để bảng kết quả không đè lên cụm nút đó. */
+      left: 56px;
       z-index: 999;
       width: 380px;
-      max-width: calc(100vw - 30px);
+      max-width: calc(100vw - 71px);
       max-height: 320px;
       overflow-y: auto;
       background: rgba(255, 255, 255, 0.98);
@@ -239,12 +241,6 @@
       font-size: 12.5px;
       color: #cc4400;
       font-weight: 700;
-      margin-top: 1px;
-    }
-
-    #searchSuggestions .sg-sub {
-      font-size: 11px;
-      color: #888;
       margin-top: 1px;
     }
 
@@ -619,7 +615,12 @@
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 500;
+      /* Phải CAO HƠN z-index mặc định 1000 của .leaflet-top/.leaflet-bottom
+         (cụm nút 🧭/📍/+/- góc trên-phải) - trên màn hình thấp, khi bảng
+         thông tin thửa mở cao lên tới ngang cụm nút đó, nếu popup có
+         z-index thấp hơn thì nút "-" (thu nhỏ) sẽ đè lên che mất nút ✕
+         đóng popup khiến người dùng không bấm tắt được. */
+      z-index: 1100;
       background: #ffffff;
       border-top: 2.5px solid #00c6a7;
       border-radius: 18px 18px 0 0;
@@ -652,7 +653,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       margin-bottom: 8px;
+    }
+
+    #popupHeaderLeft {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-width: 0;
     }
 
     #popupBrand {
@@ -680,8 +690,7 @@
     #popupTitle {
       font-size: 17px;
       font-weight: 800;
-      color: #111;
-      margin-bottom: 2px;
+      color: #e60000;
     }
 
     #popupInfo {
@@ -729,7 +738,6 @@
     #popupCoords {
       font-size: 10px;
       color: #aaa;
-      margin-bottom: 10px;
     }
 
     #popupNote {
@@ -1378,9 +1386,17 @@
     }
 
     #splash .circle-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #666;
+      font-size: 24px;
+      font-weight: 800;
+      color: #e60000;
+    }
+
+    #splash .circle-arrow {
+      font-size: 22px;
+      font-weight: 800;
+      color: #e60000;
+      line-height: 1;
+      margin-top: -2px;
     }
 
     #splash .circle.drive {
@@ -1534,7 +1550,10 @@
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 600;
+      /* Cùng lý do với #popup ở trên: phải cao hơn z-index 1000 của cụm nút
+         🧭/📍/+/- để nút ✕ đóng bảng chỉ đường không bị nút "-" che mất
+         trên màn hình thấp. */
+      z-index: 1100;
       background: #ffffff;
       border-top: 2.5px solid #1a6fd4;
       border-radius: 18px 18px 0 0;
@@ -1777,14 +1796,15 @@
       <div class="brand">TDMAP.PRO.VN</div>
       <div class="project-title">Xây dựng hệ thống hồ sơ địa chính và cơ sở dữ liệu quản lý đất đai tại xã Đam Rông 1,
         tỉnh Lâm Đồng</div>
+      <h2>Tra cứu thông tin thửa đất</h2>
       <div class="circle-row">
         <div class="circle-item">
           <div class="circle drive" onclick="loadDamRong1Map(true)">🗺️</div>
+          <span class="circle-arrow">↑</span>
           <span class="circle-label">Xem bản đồ</span>
         </div>
       </div>
-      <h2>Tra cứu thông tin thửa đất</h2>
-      <p>Bấm vào biểu tượng để xem bản đồ ranh thửa Xã Đam Rông 1<br>trên ảnh vệ tinh</p>
+      <p>Bấm vào biểu tượng để xem bản đồ ranh thửa<br>Xã Đam Rông 1 trên ảnh vệ tinh</p>
     </div>
   </div>
 
@@ -1852,12 +1872,14 @@
     <div id="popupHandle"></div>
     <div id="popupCaptureArea">
       <div id="popupHeader">
-        <span id="popupBrand">TDMAP.PRO.VN</span>
+        <div id="popupHeaderLeft">
+          <span id="popupBrand">TDMAP</span>
+          <span id="popupTitle">–</span>
+          <span id="popupCoords">–</span>
+        </div>
         <button id="popupClose" onclick="closePopup()">✕</button>
       </div>
-      <div id="popupTitle">–</div>
       <div id="popupInfo">–</div>
-      <div id="popupCoords">–</div>
       <div id="popupNote">📌 Chủ sử dụng đất vui lòng ghi lại <b>Số tờ, Số thửa</b> hoặc nhấn vào nút (Chụp ảnh
         thửa được chọn) để cung cấp cho đơn vị đo đạc thực hiện đăng ký đất đai.</div>
     </div>
@@ -1980,16 +2002,15 @@
         </div>
         <div class="form-group" style="margin-bottom:4px;">
           <label class="form-label">Số điện thoại <span style="color:#d9534f;">*</span></label>
-          <input id="regSdt" class="form-input" type="tel" placeholder="09xxxxxxxx" maxlength="15"
-            autocomplete="tel">
+          <input id="regSdt" class="form-input" type="tel" placeholder="09xxxxxxxx" maxlength="15" autocomplete="tel">
         </div>
         <div id="registerErrorMsg" style="display:none;color:#d9534f;font-size:12px;margin-top:6px;line-height:1.5;">
         </div>
       </div>
       <div class="modal-footer">
         <button class="modal-btn secondary" onclick="closeRegisterOverlay()">Huỷ</button>
-        <button id="regSubmitBtn" class="modal-btn primary" style="background:#00a884;"
-          onclick="submitRegister()">Gửi đăng ký</button>
+        <button id="regSubmitBtn" class="modal-btn primary" style="background:#00a884;" onclick="submitRegister()">Gửi
+          đăng ký</button>
       </div>
     </div>
   </div>
@@ -2020,8 +2041,8 @@
       </div>
       <div class="modal-footer">
         <button class="modal-btn secondary" onclick="closeConfirmSendOverlay()">Huỷ</button>
-        <button class="modal-btn primary" style="background:#00a884;"
-          onclick="confirmSendRegister()">Đồng ý, gửi</button>
+        <button class="modal-btn primary" style="background:#00a884;" onclick="confirmSendRegister()">Đồng ý,
+          gửi</button>
       </div>
     </div>
   </div>
@@ -2044,13 +2065,15 @@
                   <li><span class="docs-ico">🤝</span> Giấy tờ mua bán, chuyển nhượng</li>
                   <li><span class="docs-ico">🎁</span> Giấy tờ nhận tặng cho, thừa kế</li>
                   <li><span class="docs-ico">🏛️</span> Quyết định giao đất/cấp đất của Nhà nước</li>
-                  <li><span class="docs-ico">📄</span> Giấy tờ khác chứng minh nguồn gốc sử dụng đất (kê khai 299, sổ mục kê, biên lai thuế đất...)</li>
+                  <li><span class="docs-ico">📄</span> Giấy tờ khác chứng minh nguồn gốc sử dụng đất (kê khai 299, sổ
+                    mục kê, biên lai thuế đất...)</li>
                 </ul>
               </li>
             </ul>
           </div>
           <div class="docs-col">
-            <h4>2️⃣ Đất ĐÃ được cấp giấy chứng nhận<br><span class="docs-subtitle">(đăng ký biến động, cấp đổi...)</span></h4>
+            <h4>2️⃣ Đất ĐÃ được cấp giấy chứng nhận<br><span class="docs-subtitle">(đăng ký biến động, cấp
+                đổi...)</span></h4>
             <ul class="docs-list">
               <li><span class="docs-ico">🪪</span> CCCD chủ sử dụng đất (chủ 1 + chủ 2, nếu có)</li>
               <li><span class="docs-ico">📗</span> Giấy chứng nhận quyền sử dụng đất</li>
@@ -2066,7 +2089,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn primary" style="background:#1a6fd4;" onclick="closeRequiredDocsOverlay()">Đã hiểu</button>
+        <button class="modal-btn primary" style="background:#1a6fd4;" onclick="closeRequiredDocsOverlay()">Đã
+          hiểu</button>
       </div>
     </div>
   </div>
@@ -2442,9 +2466,17 @@
       const row = document.getElementById('topControlsRow');
       const searchBar = document.getElementById('searchBar');
       const suggestions = document.getElementById('searchSuggestions');
+      const logoWrap = document.getElementById('logoWrap');
       if (!row || !searchBar) return;
       const rowRect = row.getBoundingClientRect();
-      const newTop = Math.round(rowRect.bottom + 10);
+      // Lấy điểm THẤP HƠN giữa hàng nút bên trái (zoomBadge) và khung
+      // TDMAP.PRO.VN/Trạng thái/Nền nhãn bên phải (logoWrap) - trên màn hình
+      // điện thoại hẹp, logoWrap thường cao hơn zoomBadge -> nếu chỉ tính theo
+      // zoomBadge, thanh tìm kiếm bị đặt quá cao, chui xuống dưới logoWrap
+      // và bị nó đè lên.
+      let maxBottom = rowRect.bottom;
+      if (logoWrap) maxBottom = Math.max(maxBottom, logoWrap.getBoundingClientRect().bottom);
+      const newTop = Math.round(maxBottom + 10);
       searchBar.style.top = newTop + 'px';
       if (suggestions) {
         const barRect = searchBar.getBoundingClientRect();
@@ -4115,13 +4147,10 @@
 
       const shown = matches.slice(0, MAX_SUGGESTIONS);
       const rows = shown.map((p, i) => {
-        const sub = [];
-        if (p.dienTich) sub.push(`DT: ${p.dienTich}`);
-        if (p.loaiDat) sub.push(p.loaiDat);
+        const [toNum, thuaNum] = p.id.split('-');
         return `
       <div class="sg-item" onclick="selectSuggestion(${i})">
-        <div class="sg-id">Tờ-Thửa ${escapeHtml(p.id)}</div>
-        ${sub.length ? `<div class="sg-sub">${escapeHtml(sub.join(' · '))}</div>` : ''}
+        <div class="sg-id">Tờ: ${escapeHtml(toNum)}, Thửa: ${escapeHtml(thuaNum)}</div>
       </div>`;
       }).join('');
 
