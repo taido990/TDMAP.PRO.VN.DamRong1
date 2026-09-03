@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 310826  -->
+  <!-- 030926  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -1386,9 +1386,12 @@
     }
 
     #splash .circle-label {
-      font-size: 24px;
+      font-size: 15px;
       font-weight: 800;
       color: #e60000;
+      text-align: center;
+      line-height: 1.35;
+      white-space: nowrap;
     }
 
     #splash .circle-arrow {
@@ -1400,12 +1403,12 @@
     }
 
     #splash .circle.drive {
-      border-color: #1a6fd4;
-      background: rgba(26, 111, 212, 0.1);
+      border-color: #e60000;
+      background: rgba(230, 0, 0, 0.1);
     }
 
     #splash .circle.drive:active {
-      background: rgba(26, 111, 212, 0.22);
+      background: rgba(230, 0, 0, 0.22);
     }
 
     #splash h2 {
@@ -1799,9 +1802,9 @@
       <h2>Tra cứu thông tin thửa đất</h2>
       <div class="circle-row">
         <div class="circle-item">
-          <div class="circle drive" onclick="loadDamRong1Map(true)">🗺️</div>
-          <span class="circle-arrow">↑</span>
-          <span class="circle-label">Xem bản đồ</span>
+          <div class="circle drive" onclick="startMapFromSplash()">🗺️</div>
+          <span class="circle-arrow">👆</span>
+          <span class="circle-label">Bấm vào biểu tượng<br>để xem bản đồ</span>
         </div>
       </div>
       <p>Bấm vào biểu tượng để xem bản đồ ranh thửa<br>Xã Đam Rông 1 trên ảnh vệ tinh</p>
@@ -1831,6 +1834,12 @@
         title="Ẩn/hiện nền trắng phía sau nhãn thửa trên bản đồ">
         <input type="checkbox" id="toggleLblBg" onchange="setLabelBgMode(this.checked)">
         Nền nhãn
+      </label>
+      <label
+        style="font-size:11px; font-weight:700; color:#555; display:flex; align-items:center; gap:4px; cursor:pointer;"
+        title="Ẩn/hiện các địa điểm (hội trường, trường học, cầu, nhà thờ...) đọc từ file DiaDiem">
+        <input type="checkbox" id="toggleDiaDiem" checked onchange="setDiaDiemVisible(this.checked)">
+        Địa điểm
       </label>
     </div>
   </div>
@@ -2052,7 +2061,7 @@
        dồn về 1 cột trên điện thoại nhờ auto-fit/minmax). -->
   <div id="requiredDocsOverlay" class="modal-overlay">
     <div class="modal-box" style="max-width:640px;">
-      <div class="modal-header">✅ <span id="docsSuccessMsg">Đã gửi đăng ký</span></div>
+      <div class="modal-header"><span id="docsHeaderIcon">✅</span> <span id="docsSuccessMsg">Đã gửi đăng ký</span></div>
       <div class="modal-body">
         <div class="docs-title">📋 Giấy tờ kèm theo khi đi đăng ký đất đai</div>
         <div class="docs-grid">
@@ -2261,12 +2270,22 @@
     // Hộp thoại riêng (2 cột, có icon) hiện sau khi gửi đăng ký thành công, thay
     // cho showAlert() dạng text thuần - vì nội dung giấy tờ cần trình bày dạng
     // danh sách/bảng chứ không hợp với 1 khối văn bản đơn giản.
-    function openRequiredDocsOverlay(successMsg) {
+    function openRequiredDocsOverlay(successMsg, headerIcon) {
+      document.getElementById('docsHeaderIcon').textContent = headerIcon || '✅';
       document.getElementById('docsSuccessMsg').textContent = successMsg;
       document.getElementById('requiredDocsOverlay').classList.add('show');
     }
     function closeRequiredDocsOverlay() {
       document.getElementById('requiredDocsOverlay').classList.remove('show');
+    }
+
+    // Hiện trước hộp thoại hướng dẫn giấy tờ NGAY KHI bấm "Xem bản đồ" ở màn
+    // hình chào (KHÔNG phải sau khi gửi đăng ký như trước) - để người dân biết
+    // trước cần chuẩn bị gì, đỡ phải đi lại nhiều lần. Bản đồ vẫn tải song song
+    // phía sau, không bị hộp thoại này chặn lại.
+    function startMapFromSplash() {
+      openRequiredDocsOverlay('Vui lòng chuẩn bị trước các giấy tờ sau để việc đăng ký đất đai được nhanh chóng', '📋');
+      loadDamRong1Map(true);
     }
 
     // ── LOCATE ───────────────────────────────────────────────────────────────────
@@ -2647,6 +2666,8 @@
     let lastParcelClickAt = 0;
     let ranhThonLayers = [];
     let currentLoadedFileName = '';
+    let diaDiemLayers = [];
+    let diaDiemVisible = true;
 
     // ── KML PARSER ────────────────────────────────────────────────────────────────
     // Trả về { parcels, ranhThon: { lines, labels } }
@@ -3468,7 +3489,7 @@
     // scheduleViewportSync() lo việc thêm/gỡ polygon theo khung nhìn (viewport
     // culling) - cần thiết để giữ mượt khi file có 30.000-50.000+ thửa; nó tự gọi
     // updateAllLabels() sau khi đồng bộ xong.
-    map.on('zoomend moveend', () => { scheduleViewportSync(); updateZoomBadge(); });
+    map.on('zoomend moveend', () => { scheduleViewportSync(); updateZoomBadge(); updateDiaDiemVisibility(); });
     updateZoomBadge();
 
     function renderParcels(list, onRenderProgress) {
@@ -3523,6 +3544,207 @@
         }).addTo(map);
         ranhThonLayers.push(marker);
       });
+    }
+
+    // ── LỚP ĐỊA ĐIỂM (Hội trường / Trường học / Cầu / Nhà thờ...) ───────────────────
+    // Đọc từ 1 file GeoJSON RIÊNG, nằm CÙNG thư mục Drive với file ranh thửa
+    // chính, đặt tên theo mẫu "<ngày tháng>_DamRong1_DiaDiem.geojson" (vd
+    // "0309_DamRong1_DiaDiem.geojson" = xuất ngày 03/09). Khi xã xuất file mới
+    // (tên đổi theo ngày khác) thì lần quét thư mục kế tiếp tự lấy đúng bản MỚI
+    // NHẤT theo modifiedTime trên Drive - giống hệt cơ chế chọn file ranh thửa
+    // mới nhất ở listDriveGeojsonFiles(), không cần người dùng tự chọn lại.
+    const DIADIEM_FILE_RE = /DamRong1_DiaDiem\.geojson$/i;
+
+    // Bỏ dấu tiếng Việt để so khớp từ khoá không phân biệt có/không dấu.
+    function stripDiacritics(str) {
+      return String(str || '')
+        .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+        .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+    }
+
+    // Lấy 1 thuộc tính theo danh sách tên trường ứng viên, KHÔNG phân biệt hoa/
+    // thường (khác các file do QGIS xuất có thể đặt tên trường tuỳ ý, vd
+    // "tenChu", "ten_chu", "TenChu", "name"...).
+    function getPropCI(props, keys) {
+      const lower = {};
+      Object.keys(props || {}).forEach(k => { lower[k.toLowerCase()] = props[k]; });
+      for (const k of keys) {
+        const v = lower[k.toLowerCase()];
+        if (v != null && String(v).trim() !== '') return String(v).trim();
+      }
+      return '';
+    }
+
+    // Biểu tượng hiển thị theo TỪ KHOÁ nhận diện trong tên địa điểm (cột "Tên
+    // chủ" của file DiaDiem, ghi kiểu "Hội trường thôn 1", "Trường TH Y",
+    // "Cầu Suối Đá", "Nhà thờ Giáo xứ Z"...). Thứ tự kiểm tra có ý nghĩa: đặt
+    // các mẫu cụ thể hơn ("hoi truong") trước mẫu chung hơn ("truong") để
+    // "Hội trường" không bị nhận nhầm thành "Trường học".
+    // Danh sách nhóm đối tượng thường gặp trong file DiaGiem của các xã (đúc kết
+    // từ dữ liệu thực tế xã Đam Rông 1 + các hạng mục công cộng phổ biến khác).
+    // Thứ tự kiểm tra CÓ Ý NGHĨA: mẫu cụ thể hơn luôn đặt TRƯỚC mẫu chung hơn,
+    // để tránh bắt nhầm (vd "Hội trường" phải đứng trước "Trường học"; "Nhà thờ"
+    // phải đứng trước "Nhà" chung chung).
+    function classifyDiaDiemIcon(name) {
+      const t = stripDiacritics(name).toLowerCase();
+      if (!t.trim()) return { icon: '📍', label: 'Địa điểm' };
+
+      if (/\bhoi\s*truong\b/.test(t)) return { icon: '🏛️', label: 'Hội trường' };
+      if (/\bnha\s*tho\b|\bgiao\s*xu\b|\bgiao\s*duong\b/.test(t)) return { icon: '⛪', label: 'Nhà thờ' };
+      if (/\bchua\b|\bdinh\b|\bmieu\b|\bthanh\s*that\b/.test(t)) return { icon: '🛕', label: 'Chùa/Đình/Miếu' };
+      // Chỉ nhận "trường học" khi đi kèm từ chỉ cấp học (hoc/tieu hoc/thcs/...),
+      // KHÔNG nhận riêng từ "truong" đứng một mình - vì sau khi bỏ dấu, "Trường"
+      // (trường học) và "Trưởng" (vd "Nhà Trưởng thôn") đều thành "truong", dễ
+      // bắt nhầm nhà trưởng thôn/thôn trưởng thành trường học.
+      if (/\btruong\s*(hoc|tieu\s*hoc|trung\s*hoc|mau\s*giao|thcs|thpt)\b/.test(t) || /\bmam\s*non\b/.test(t)) return { icon: '🏫', label: 'Trường học' };
+      if (/\bcau\b/.test(t)) return { icon: '🌉', label: 'Cầu' };
+      if (/\bsan\s*bong\b|\bsan\s*the\s*thao\b|\bsan\s*van\s*dong\b/.test(t)) return { icon: '⚽', label: 'Sân bóng/Sân thể thao' };
+      if (/\bnghia\s*trang\b|\bnghia\s*dia\b|\bnghi\s*trang\b/.test(t)) return { icon: '🪦', label: 'Nghĩa trang/Nghĩa địa' };
+      if (/\btram\s*y\s*te\b|\bbenh\s*vien\b|\bphong\s*kham\b/.test(t)) return { icon: '🏥', label: 'Trạm y tế/Bệnh viện' };
+      if (/\buy\s*ban\b|\bubnd\b|\btru\s*so\b/.test(t)) return { icon: '🏢', label: 'Trụ sở/UBND' };
+      if (/\bcho\b/.test(t)) return { icon: '🏬', label: 'Chợ' };
+      if (/\btap\s*hoa\b|\bcua\s*hang\b|\bsieu\s*thi\b/.test(t)) return { icon: '🏪', label: 'Cửa hàng/Tạp hóa' };
+      if (/\btram\s*bien\s*ap\b|\btram\s*dien\b/.test(t)) return { icon: '⚡', label: 'Trạm điện' };
+      if (/\bgieng\b|\bbe\s*nuoc\b|\btrat\s*nuoc\b/.test(t)) return { icon: '💧', label: 'Giếng/Bể nước' };
+      if (/\bnga\s*(2|3|4|ba|tu|nam)\b/.test(t)) return { icon: '🔀', label: 'Ngã ba/Ngã tư' };
+      // "Nhà" chung chung (vd nhà văn hoá thôn, nhà trưởng thôn...) - kiểm tra
+      // SAU CÙNG trong nhóm "nhà ..." vì các loại nhà cụ thể hơn (nhà thờ) đã
+      // được nhận diện riêng ở trên rồi.
+      if (/\bnha\b/.test(t)) return { icon: '🏠', label: 'Nhà' };
+
+      return { icon: '📍', label: 'Địa điểm' };
+    }
+
+    // Nếu không có trường tên "sạch" (tenChu/name/...), 1 số bản xuất DiaDiem
+    // vẫn dùng chung định dạng "label" gộp như thửa đất chính, vd chuỗi
+    // "0-0-2348.8-NNP-Nhà Thờ Cơ đốc-CDK" (khoa-dienTich-loaiDat-tenChu-trạng
+    // thái) - PHẢI tách lấy đúng phần TÊN, không hiển thị nguyên cả chuỗi gộp
+    // (nhìn giống hệt nhãn thửa đất, gây nhầm lẫn với lớp địa chính).
+    function extractNameFromCompoundLabel(label) {
+      const s = String(label || '').trim();
+      const idM = s.match(/^(\d+[-–]\d+)-/);
+      if (!idM) return '';
+      const id = idM[1].replace('–', '-');
+      return parseLabelCompound(s, id).tenChu || '';
+    }
+
+    function centroidOfRing(ring) {
+      if (!ring || !ring.length) return null;
+      const lon = ring.reduce((s, c) => s + c[0], 0) / ring.length;
+      const lat = ring.reduce((s, c) => s + c[1], 0) / ring.length;
+      return [lat, lon];
+    }
+
+    // Đọc file GeoJSON địa điểm. Giống thửa đất, 1 địa điểm có thể xuất ra 2
+    // Feature (Polygon ranh vùng + Point nhãn) - GHÉP lại theo chuỗi 'label'
+    // (giống nhau giữa 2 Feature của CÙNG 1 địa điểm), CHỈ vẽ 1 biểu tượng/
+    // địa điểm, tránh hiện trùng 2 nhãn cho cùng 1 chỗ (1 nhãn tên sạch từ
+    // Point + 1 nhãn label gộp thô từ Polygon) như trước đây.
+    function parseDiaDiemGeoJSON(text) {
+      const gj = typeof text === 'string' ? JSON.parse(text) : text;
+      const feats = (gj && gj.features) || [];
+      const byId = {};
+      let autoIdx = 0;
+
+      feats.forEach(f => {
+        const props = (f && f.properties) || {};
+        const geom = f && f.geometry;
+        if (!geom) return;
+
+        let pointLatLon = null, polyLatLon = null;
+        if (geom.type === 'Point') {
+          const [lo, la] = geom.coordinates || [];
+          if (!isNaN(la) && !isNaN(lo)) pointLatLon = [la, lo];
+        } else if (geom.type === 'Polygon') {
+          polyLatLon = centroidOfRing((geom.coordinates || [])[0]);
+        } else if (geom.type === 'MultiPolygon') {
+          polyLatLon = centroidOfRing(((geom.coordinates || [])[0] || [])[0]);
+        } else {
+          return;
+        }
+        if (!pointLatLon && !polyLatLon) return;
+
+        const rawLabel = getPropCI(props, ['label']);
+        // Ưu tiên gộp theo NGUYÊN CHUỖI 'label' (giống nhau giữa cặp Polygon+Point
+        // của CÙNG 1 địa điểm, khác nhau giữa các địa điểm khác nhau). KHÔNG dùng
+        // 'khoa' làm khoá chính - với file DiaDiem, 'khoa' thường chỉ là giá trị
+        // giữ chỗ cố định (vd luôn "0-0" cho mọi địa điểm), không đóng vai trò mã
+        // định danh riêng như ở file thửa đất chính -> nếu ưu tiên 'khoa' sẽ gộp
+        // NHẦM toàn bộ các địa điểm khác nhau thành 1 bản ghi duy nhất.
+        let id = rawLabel || ((props.khoa != null && props.khoa !== '') ? String(props.khoa) : null);
+        id = id ? id.replace('–', '-') : ('_auto' + (autoIdx++));
+
+        if (!byId[id]) byId[id] = { lat: null, lon: null, tenChu: '' };
+        const rec = byId[id];
+
+        // Ưu tiên toạ độ Point (đúng vị trí nhãn) hơn tâm hình học Polygon.
+        if (pointLatLon) { rec.lat = pointLatLon[0]; rec.lon = pointLatLon[1]; }
+        else if (rec.lat == null && polyLatLon) { rec.lat = polyLatLon[0]; rec.lon = polyLatLon[1]; }
+
+        if (!rec.tenChu) {
+          let ten = getPropCI(props, ['tenChu', 'ten_chu', 'ten', 'name', 'diaDiem', 'dia_diem', 'hangMuc', 'hang_muc', 'title']);
+          if (!ten && rawLabel) ten = extractNameFromCompoundLabel(rawLabel) || rawLabel;
+          if (ten) rec.tenChu = ten.replace(/-(CDK|DDK)$/i, '').trim();
+        }
+      });
+
+      return Object.values(byId).filter(r => r.lat != null && r.tenChu);
+    }
+
+    // Chỉ hiện nhãn địa điểm khi zoom đủ lớn (≥16) - tránh rối bản đồ khi đang
+    // xem toàn xã ở mức zoom nhỏ, giống cơ chế ẩn/hiện nhãn thửa đất theo zoom.
+    const DIADIEM_MIN_ZOOM = 16;
+
+    // Vẽ lớp địa điểm lên bản đồ: mỗi điểm 1 biểu tượng + tên (cột "Tên chủ")
+    // ngay bên dưới, chạm vào hiện chú thích loại địa điểm nhận diện được.
+    function renderDiaDiem(list) {
+      diaDiemLayers.forEach(l => map.removeLayer(l));
+      diaDiemLayers = [];
+      (list || []).forEach(pt => {
+        const { icon, label } = classifyDiaDiemIcon(pt.tenChu);
+        const marker = L.marker([pt.lat, pt.lon], {
+          icon: L.divIcon({
+            className: 'diadiem-lbl-style',
+            html: `<span class="dd-ico">${icon}</span><span class="dd-name">${escapeHtml(pt.tenChu)}</span>`,
+            iconSize: null
+          }),
+          keyboard: false
+        });
+        marker.bindTooltip(`${icon} ${escapeHtml(label)}: ${escapeHtml(pt.tenChu)}`, { direction: 'top', offset: [0, -8] });
+        diaDiemLayers.push(marker);
+      });
+      updateDiaDiemVisibility();
+    }
+
+    function setDiaDiemVisible(checked) {
+      diaDiemVisible = checked;
+      updateDiaDiemVisibility();
+    }
+
+    // Đồng bộ hiện/ẩn TOÀN BỘ marker địa điểm theo cả 2 điều kiện: checkbox
+    // "Địa điểm" đang bật, VÀ zoom hiện tại ≥ DIADIEM_MIN_ZOOM. Gọi lại mỗi khi
+    // zoom đổi (xem map.on('zoomend'...) bên dưới) hoặc khi bật/tắt checkbox.
+    function updateDiaDiemVisibility() {
+      const show = diaDiemVisible && map.getZoom() >= DIADIEM_MIN_ZOOM;
+      diaDiemLayers.forEach(l => {
+        const onMap = map.hasLayer(l);
+        if (show && !onMap) l.addTo(map);
+        else if (!show && onMap) map.removeLayer(l);
+      });
+    }
+
+    // Tải riêng file DiaDiem mới nhất tìm thấy trong thư mục Drive (chạy song
+    // song, KHÔNG chặn việc mở file ranh thửa chính) rồi vẽ lên bản đồ.
+    async function loadDiaDiemFile(fileId, fileName, apiKey) {
+      try {
+        const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${encodeURIComponent(apiKey)}`);
+        if (!res.ok) return;
+        const text = await res.text();
+        const list = parseDiaDiemGeoJSON(text);
+        renderDiaDiem(list);
+      } catch (err) {
+        console.warn('Không tải được file địa điểm', fileName, err);
+      }
     }
 
     // ── POPUP BẢN ĐỒ ──────────────────────────────────────────────────────────────
@@ -4782,7 +5004,21 @@
           pageToken = data.nextPageToken || '';
         } while (pageToken);
 
-        const geojsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.geojson'));
+        const allGeojsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.geojson'));
+        // File địa điểm (DiaDiem) là 1 lớp RIÊNG (hội trường/trường học/cầu/nhà
+        // thờ...), KHÔNG phải bản đồ ranh thửa chính - phải loại khỏi danh sách
+        // dưới đây, nếu không có nguy cơ bị chọn nhầm làm bản đồ chính khi nó là
+        // file có ngày sửa mới nhất trong thư mục.
+        const geojsonFiles = allGeojsonFiles.filter(f => !DIADIEM_FILE_RE.test(f.name));
+        const diaDiemFiles = allGeojsonFiles.filter(f => DIADIEM_FILE_RE.test(f.name));
+
+        if (diaDiemFiles.length > 0) {
+          // Luôn lấy bản MỚI NHẤT theo modifiedTime (tương ứng file có ngày tháng
+          // trong tên mới nhất, vd "0309_DamRong1_DiaDiem.geojson"); tải song
+          // song, không chặn việc mở bản đồ ranh thửa chính bên dưới.
+          const newestDiaDiem = diaDiemFiles.slice().sort((a, b) => (b.modifiedTime || '').localeCompare(a.modifiedTime || ''))[0];
+          loadDiaDiemFile(newestDiaDiem.id, newestDiaDiem.name, apiKey);
+        }
 
         if (geojsonFiles.length === 0) {
           setDriveStatus('Không tìm thấy file .geojson nào trong thư mục này.', true);
@@ -5087,6 +5323,32 @@ body.hide-lbl-bg .lbl-style {
   transform: translate(-50%, -50%);
   background: transparent !important;
   border: none !important;
+}
+.diadiem-lbl-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+}
+.diadiem-lbl-style .dd-ico {
+  font-size: 21px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.85));
+}
+.diadiem-lbl-style .dd-name {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.92);
+  border: 1.5px solid #00e5c4;
+  border-radius: 5px;
+  padding: 2px 7px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.65);
 }`;
     document.head.appendChild(s);
   </script>
