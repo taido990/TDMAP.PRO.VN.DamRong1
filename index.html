@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 030926  -->
+  <!-- 060926  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -943,19 +943,22 @@
 
     .docs-note {
       background: #fff4d6;
-      border: 1px solid #ffdf99;
+      border: 2px solid #ffdf99;
       border-radius: 10px;
       padding: 12px 14px;
+      margin-bottom: 16px;
     }
 
     .docs-note-title {
       font-weight: 800;
-      font-size: 12.5px;
+      font-size: 16px;
       color: #7a5200;
       margin-bottom: 8px;
     }
 
     .docs-note .docs-list li {
+      font-size: 13.5px;
+      font-weight: 700;
       color: #7a5200;
     }
 
@@ -1825,7 +1828,7 @@
     <div style="display:flex; align-items:center; gap:10px;">
       <label
         style="font-size:11px; font-weight:700; color:#555; display:flex; align-items:center; gap:4px; cursor:pointer;"
-        title="Tô màu ranh thửa: XANH NGỌC = đã có thông tin, VÀNG = chưa có (giống thửa chưa đăng ký)">
+        title="Tô màu ranh thửa: HỒNG = đã đăng ký, XANH NGỌC và VÀNG = chưa đăng ký">
         <input type="checkbox" id="toggleOwnerColor" checked onchange="setOwnerColorMode(this.checked)">
         Trạng thái
       </label>
@@ -1841,6 +1844,26 @@
         <input type="checkbox" id="toggleDiaDiem" checked onchange="setDiaDiemVisible(this.checked)">
         Địa điểm
       </label>
+    </div>
+
+    <!-- CHÚ GIẢI MÀU RANH THỬA: giải thích ý nghĩa màu viền HỒNG/XANH NGỌC/VÀNG
+         ngay dưới hàng checkbox, để người xem không cần bấm gì cũng hiểu màu. -->
+    <div
+      style="display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:700; color:#555; border-top:1px solid rgba(0,0,0,0.08); padding-top:5px; margin-top:1px;">
+      <span style="display:flex; align-items:center; gap:4px;">
+        <span
+          style="width:10px; height:10px; border-radius:3px; background:#ff1493; display:inline-block; flex:none;"></span>
+        Đã đăng ký
+      </span>
+      <span style="display:flex; align-items:center; gap:4px;">
+        <span style="display:flex; flex:none;">
+          <span
+            style="width:10px; height:10px; border-radius:3px 0 0 3px; background:#00e5ff; display:inline-block;"></span>
+          <span
+            style="width:10px; height:10px; border-radius:0 3px 3px 0; background:#ffff00; display:inline-block;"></span>
+        </span>
+        Chưa đăng ký
+      </span>
     </div>
   </div>
 
@@ -2064,6 +2087,13 @@
       <div class="modal-header"><span id="docsHeaderIcon">✅</span> <span id="docsSuccessMsg">Đã gửi đăng ký</span></div>
       <div class="modal-body">
         <div class="docs-title">📋 Giấy tờ kèm theo khi đi đăng ký đất đai</div>
+        <div class="docs-note">
+          <div class="docs-note-title">💡 Lưu ý chung</div>
+          <ul class="docs-list">
+            <li><span class="docs-ico">📷</span> Photo tất cả giấy tờ liên quan (CCCD, giấy tờ nguồn gốc/GCN...)</li>
+            <li><span class="docs-ico">🔍</span> Mang theo bản gốc để đối chiếu</li>
+          </ul>
+        </div>
         <div class="docs-grid">
           <div class="docs-col">
             <h4>1️⃣ Đất CHƯA được cấp giấy chứng nhận<br><span class="docs-subtitle">(đăng ký lần đầu)</span></h4>
@@ -2088,13 +2118,6 @@
               <li><span class="docs-ico">📗</span> Giấy chứng nhận quyền sử dụng đất</li>
             </ul>
           </div>
-        </div>
-        <div class="docs-note">
-          <div class="docs-note-title">💡 Lưu ý chung</div>
-          <ul class="docs-list">
-            <li><span class="docs-ico">📷</span> Photo tất cả giấy tờ liên quan (CCCD, giấy tờ nguồn gốc/GCN...)</li>
-            <li><span class="docs-ico">🔍</span> Mang theo bản gốc để đối chiếu</li>
-          </ul>
         </div>
       </div>
       <div class="modal-footer">
