@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TDMAP.PRO.VN.DamRong1</title>
-  <!-- 060926  -->
+  <title>TDMAP.PRO.VN.DAMRONG1</title>
+  <!-- 110926  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -628,10 +628,56 @@
       transform: translateY(110%);
       transition: transform .3s cubic-bezier(.32, 0, .2, 1);
       box-shadow: 0 -6px 32px rgba(0, 0, 0, .2);
+      /* Giới hạn chiều cao để trên điện thoại màn hình thấp/độ phân giải thấp,
+         bảng thông tin thửa không cao tới mức che kín toàn bộ màn hình (mất
+         hẳn bản đồ phía sau) - phần nội dung dư sẽ tự cuộn bên trong thay vì
+         đẩy popup tràn lên quá đỉnh màn hình. */
+      max-height: 78vh;
+      max-height: 78dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     #popup.open {
       transform: translateY(0);
+    }
+
+    /* Điện thoại màn hình thấp (độ phân giải thấp / màn nhỏ): thu gọn khoảng
+       cách, chữ để bảng thông tin thửa chiếm ít chỗ hơn, càng không cần cuộn. */
+    @media (max-height: 600px) {
+      #popup {
+        max-height: 68vh;
+        max-height: 68dvh;
+        padding: 8px 12px 14px;
+      }
+
+      #popupHandle {
+        margin-bottom: 8px;
+      }
+
+      #popupTitle {
+        font-size: 15px;
+      }
+
+      #popupInfo .popup-owner-line {
+        font-size: 15px;
+      }
+
+      #popupNote {
+        font-size: 11px;
+        padding: 5px 8px;
+        margin-bottom: 6px;
+      }
+
+      #btnRegister {
+        padding: 8px;
+        margin-bottom: 6px;
+      }
+
+      .btn-row a {
+        padding: 6px 6px;
+        font-size: 11px;
+      }
     }
 
     /* Vùng được chụp ảnh khi bấm nút "Chụp ảnh" (KHÔNG gồm popupHandle/btn-row)
@@ -960,6 +1006,31 @@
       font-size: 13.5px;
       font-weight: 700;
       color: #7a5200;
+    }
+
+    /* Điện thoại: luôn ép "Giấy tờ kèm theo" về 1 cột (thay vì trông chờ
+       auto-fit của grid), thu gọn chữ/khoảng cách để không bị tràn ngang. */
+    @media (max-width: 480px) {
+      .docs-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .docs-title {
+        font-size: 13px;
+      }
+
+      .docs-note {
+        padding: 10px 12px;
+      }
+
+      .docs-note-title {
+        font-size: 14px;
+      }
+
+      .docs-col {
+        padding: 10px 12px;
+      }
     }
 
     /* NÚT: LINK HSQ XÃ (ngoài danh sách thửa trong file KML/GeoJSON) - cùng hàng với labelZoomControl */
@@ -1348,6 +1419,56 @@
       gap: 14px;
       width: 340px;
       max-width: 92vw;
+      max-height: 90vh;
+      max-height: 90dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Điện thoại màn hình nhỏ / thấp: thu gọn khoảng cách, chữ, ảnh minh họa
+       để toàn bộ thẻ splash không bị tràn khỏi màn hình. */
+    @media (max-width: 400px), (max-height: 700px) {
+      #splash {
+        padding: 12px;
+      }
+
+      #splashCard {
+        padding: 18px 16px 16px;
+        gap: 10px;
+        border-radius: 16px;
+      }
+
+      #splash .project-title {
+        font-size: 12px;
+      }
+
+      #splash h2 {
+        font-size: 15px;
+      }
+
+      #splash .circle {
+        width: 60px;
+        height: 60px;
+        font-size: 26px;
+      }
+
+      #splash .circle-label {
+        font-size: 13px;
+        white-space: normal;
+      }
+
+      #splash p {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      #splash .splash-note {
+        padding: 8px 10px 10px;
+      }
+
+      #splash .splash-note-illus {
+        max-width: 170px;
+      }
     }
 
     #splash .brand {
@@ -1433,6 +1554,67 @@
       color: #555;
       text-align: center;
       line-height: 1.7;
+    }
+
+    /* Ghi chú: ranh bản đồ địa chính (đo đạc) so với ảnh vệ tinh nền có thể lệch nhau */
+    #splash .splash-note {
+      width: 100%;
+      background: #fff8e1;
+      border: 1px solid #ffd54f;
+      border-radius: 12px;
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #splash .splash-note-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #a15c00;
+      text-align: center;
+    }
+
+    #splash .splash-note-text {
+      font-size: 11.5px;
+      color: #6b4c00;
+      text-align: center;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    #splash .splash-note-illus {
+      width: 100%;
+      max-width: 230px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      margin-top: 2px;
+    }
+
+    #splash .splash-note-legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #444;
+      margin-top: 2px;
+    }
+
+    #splash .splash-note-legend span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #splash .splash-note-legend i {
+      display: inline-block;
+      width: 14px;
+      height: 3px;
+      border-radius: 2px;
     }
 
     /* DROP OVERLAY */
@@ -1792,6 +1974,14 @@
     #hsqGuideOverlay .modal-box {
       max-width: 520px;
     }
+
+    /* Điện thoại: xếp 2 cột "Đất CHƯA/ĐÃ cấp GCN" chồng dọc thay vì ép ngang,
+       tránh chữ bị bóp/che khuất và phải cuộn ngang. */
+    @media (max-width: 480px) {
+      .hsq-guide-cols {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 
@@ -1811,6 +2001,22 @@
         </div>
       </div>
       <p>Bấm vào biểu tượng để xem bản đồ ranh thửa<br>Xã Đam Rông 1 trên ảnh vệ tinh</p>
+
+      <div class="splash-note">
+        <div class="splash-note-title">⚠️ Lưu ý về ranh thửa trên bản đồ</div>
+        <p class="splash-note-text">
+          Ranh bản đồ địa chính (đo đạc) và ranh trên ảnh vệ tinh nền (Google Map)
+          có thể <b>không khớp hoàn toàn</b> do sai số ảnh và thời điểm chụp khác nhau.
+          Ranh hiển thị trên bản đồ chỉ mang tính <b>tham khảo về vị trí và hình thể</b>,
+          không thay thế hồ sơ đo đạc chính thức.
+        </p>
+        <img class="splash-note-illus" src="ranh-minh-hoa.jpg" alt="Minh họa ranh ảnh Google Map (đỏ) so với ranh bản đồ đo đạc (vàng)">
+
+        <div class="splash-note-legend">
+          <span><i style="background:#ff2d2d"></i>Ranh ảnh Google Map</span>
+          <span><i style="background:#ffd400"></i>Ranh bản đồ đo đạc</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3053,7 +3259,7 @@
         // Chỉ cần duyệt các thửa ĐANG có mặt trên bản đồ (renderedSet), không phải
         // toàn bộ allParcels -> rất nhanh dù file có 30.000-50.000+ thửa.
         renderedSet.forEach(p => {
-          if (p._lblBound) { p._poly.unbindTooltip(); p._lblBound = false; }
+          if (p._lblBound) { p._dot.unbindTooltip(); p._lblBound = false; }
           if (p._dot && p._dotAdded) { map.removeLayer(p._dot); p._dotAdded = false; }
         });
         return;
@@ -3063,10 +3269,16 @@
         if (!p._poly || !p._lbl) return;
         const inView = p.lat != null && p.lon != null && viewBounds.contains([p.lat, p.lon]);
         if (inView) {
-          if (!p._lblBound) { p._poly.bindTooltip(p._lbl); p._lblBound = true; }
+          // Gắn nhãn vào chấm tâm (_dot, đặt đúng tại p.lat/p.lon) thay vì vào
+          // polygon (_poly) - Leaflet tự tính "tâm" polygon bằng thuật toán
+          // riêng (bounding box / centroid hình học), với thửa nhỏ/hẹp/hình
+          // tam giác méo, điểm đó có thể rơi ra NGOÀI ranh thửa khiến nhãn bị
+          // hiển thị lệch hẳn ra ngoài hình. Gắn vào _dot đảm bảo nhãn luôn ở
+          // đúng điểm tâm đã tính sẵn, trùng vị trí chấm xanh giữa thửa.
+          if (!p._lblBound) { p._dot.bindTooltip(p._lbl); p._lblBound = true; }
           if (p._dot && !p._dotAdded) { p._dot.addTo(map); p._dot.redraw(); p._dotAdded = true; }
         } else {
-          if (p._lblBound) { p._poly.unbindTooltip(); p._lblBound = false; }
+          if (p._lblBound) { p._dot.unbindTooltip(); p._lblBound = false; }
           if (p._dot && p._dotAdded) { map.removeLayer(p._dot); p._dotAdded = false; }
         }
       });
@@ -3377,8 +3589,8 @@
     function removeParcelFromMap(p) {
       if (!p._onMap) return;
       map.removeLayer(p._poly);
+      if (p._lblBound) { p._dot.unbindTooltip(); p._lblBound = false; }
       if (p._dotAdded) { map.removeLayer(p._dot); p._dotAdded = false; }
-      if (p._lblBound) { p._poly.unbindTooltip(); p._lblBound = false; }
       p._onMap = false;
       renderedSet.delete(p);
     }
