@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DAMRONG1</title>
-  <!-- 110926  -->
+  <!-- 210926  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -1008,6 +1008,13 @@
       color: #7a5200;
     }
 
+    /* Dòng nhấn mạnh trong "Lưu ý chung": chữ to gấp đôi (13.5px -> 27px), màu đỏ */
+    .docs-note .docs-list li.docs-warn {
+      font-size: 27px;
+      line-height: 1.25;
+      color: #e00000;
+    }
+
     /* Điện thoại: luôn ép "Giấy tờ kèm theo" về 1 cột (thay vì trông chờ
        auto-fit của grid), thu gọn chữ/khoảng cách để không bị tràn ngang. */
     @media (max-width: 480px) {
@@ -1026,6 +1033,10 @@
 
       .docs-note-title {
         font-size: 14px;
+      }
+
+      .docs-note .docs-list li.docs-warn {
+        font-size: 22px;
       }
 
       .docs-col {
@@ -1431,7 +1442,8 @@
 
     /* Điện thoại màn hình nhỏ / thấp: thu gọn khoảng cách, chữ, ảnh minh họa
        để toàn bộ thẻ splash không bị tràn khỏi màn hình. */
-    @media (max-width: 400px), (max-height: 700px) {
+    @media (max-width: 400px),
+    (max-height: 700px) {
       #splash {
         padding: 12px;
       }
@@ -2014,7 +2026,8 @@
           Ranh hiển thị trên bản đồ chỉ mang tính <b>tham khảo về vị trí và hình thể</b>,
           không thay thế hồ sơ đo đạc chính thức.
         </p>
-        <img class="splash-note-illus" src="ranh-minh-hoa.jpg" alt="Minh họa ranh ảnh Google Map (đỏ) so với ranh bản đồ đo đạc (vàng)">
+        <img class="splash-note-illus" src="ranh-minh-hoa.jpg"
+          alt="Minh họa ranh ảnh Google Map (đỏ) so với ranh bản đồ đo đạc (vàng)">
 
         <div class="splash-note-legend">
           <span><i style="background:#ff2d2d"></i>Ranh ảnh Google Map</span>
@@ -2039,7 +2052,7 @@
       <label
         style="font-size:11px; font-weight:700; color:#555; display:flex; align-items:center; gap:4px; cursor:pointer;"
         title="Tô màu ranh thửa: HỒNG = đã đăng ký, XANH NGỌC và VÀNG = chưa đăng ký">
-        <input type="checkbox" id="toggleOwnerColor" checked onchange="setOwnerColorMode(this.checked)">
+        <input type="checkbox" id="toggleOwnerColor" onchange="setOwnerColorMode(this.checked)">
         Trạng thái
       </label>
       <label
@@ -2301,7 +2314,8 @@
           <div class="docs-note-title">💡 Lưu ý chung</div>
           <ul class="docs-list">
             <li><span class="docs-ico">📷</span> Photo tất cả giấy tờ liên quan (CCCD, giấy tờ nguồn gốc/GCN...)</li>
-            <li><span class="docs-ico">🔍</span> Mang theo bản gốc để đối chiếu</li>
+            <li class="docs-warn"><span class="docs-ico">🔍</span> Mang theo bản gốc căn cước vợ/chồng, giấy chứng nhận
+              (Bìa đỏ)</li>
           </ul>
         </div>
         <div class="docs-grid">
@@ -3227,16 +3241,16 @@
     // (moveend) nhưng chỉ xử lý phần đang hiển thị nên rất nhẹ. Ranh thửa (polygon)
     // luôn hiển thị ở mọi mức zoom, chỉ nhãn + chấm điểm bị ẩn khi zoom nhỏ.
     const LABEL_ZOOM_OPTIONS = [16, 17, 18, 19];
-    const LABEL_ZOOM_STORAGE_KEY = 'tdmap_labelMinZoom';
-    // Ngưỡng hiện nhãn + chấm điểm — người dùng có thể đổi qua control 16/17/18,
-    // lựa chọn được nhớ lại cho lần mở sau (localStorage). Mặc định 17 nếu chưa
-    // từng chọn hoặc giá trị lưu không hợp lệ.
+    const LABEL_ZOOM_STORAGE_KEY = 'tdmap_labelMinZoom_v2';
+    // Ngưỡng hiện nhãn + chấm điểm — người dùng có thể đổi qua control 16/17/18/19,
+    // lựa chọn được nhớ lại cho lần mở sau (localStorage). Mặc định 19 nếu chưa
+    // từng chọn hoặc giá trị lưu không hợp lệ. (Khóa _v2: bỏ lựa chọn cũ đã lưu.)
     let LABEL_MIN_ZOOM = (() => {
       try {
         const saved = parseInt(localStorage.getItem(LABEL_ZOOM_STORAGE_KEY), 10);
         if (LABEL_ZOOM_OPTIONS.includes(saved)) return saved;
       } catch (e) { /* localStorage có thể bị chặn (chế độ ẩn danh...) — bỏ qua */ }
-      return 17;
+      return 19;
     })();
 
     function setLabelMinZoom(z) {
@@ -3445,18 +3459,18 @@
     }
 
     // ── HIỂN THỊ MÀU RANH THEO TÊN CHỦ + NỀN NHÃN — ghi nhớ lựa chọn cho lần mở sau ──
-    const OWNER_COLOR_STORAGE_KEY = 'tdmap_showOwnerColor';
-    const LABEL_BG_STORAGE_KEY = 'tdmap_showLabelBg';
+    const OWNER_COLOR_STORAGE_KEY = 'tdmap_showOwnerColor_v2';
+    const LABEL_BG_STORAGE_KEY = 'tdmap_showLabelBg_v2';
 
-    // Checkbox "Tên chủ": mặc định BẬT (tích) khi mở lần đầu -> tô ranh theo tên chủ
-    // (xanh ngọc = có tên chủ). Nếu người dùng đã từng đổi, dùng lại lựa chọn cũ.
+    // Checkbox "Trạng thái": mặc định TẮT (không tích) khi mở lần đầu. Nếu người dùng
+    // đã từng đổi, dùng lại lựa chọn cũ. (Khóa _v2: bỏ lựa chọn cũ đã lưu.)
     let SHOW_OWNER_COLOR = (() => {
       try {
         const saved = localStorage.getItem(OWNER_COLOR_STORAGE_KEY);
         if (saved === '0') return false;
         if (saved === '1') return true;
       } catch (e) { /* localStorage có thể bị chặn — bỏ qua */ }
-      return true;
+      return false;
     })();
 
     // Checkbox "Nền nhãn": giữ nguyên mặc định cũ là TẮT (không tích) khi mở lần đầu.
@@ -3501,7 +3515,7 @@
       renderedSet.forEach(p => {
         if (p._poly) {
           const c = getParcelColor(p);
-          p._poly.setStyle({ color: c, fillColor: c });
+          p._poly.setStyle({ color: c, fillColor: getParcelFillColor(p), fillOpacity: getParcelFillOpacity(p) });
         }
       });
     }
@@ -3522,6 +3536,17 @@
       if (SHOW_OWNER_COLOR && p && p.tenChu && p.tenChu.trim()) return '#00e5ff33';
       return '#ffff0033';
     }
+    // Màu nền mờ theo loại đất: DGT (đất giao thông) cam, SON (sông, ngòi) xanh lá,
+    // DTL (thủy lợi) xanh lơ. Các loại đất khác giữ nền mờ nhẹ theo màu viền như cũ.
+    const LANDTYPE_FILL = { DGT: '#ff8000', SON: '#00ff00', DTL: '#00ffff' };
+    const LANDTYPE_FILL_OPACITY = 0.5;
+    function getParcelLandFill(p) {
+      const parts = String((p && p.loaiDat) || '').toUpperCase().split(/[^A-Z]+/);
+      for (const t of parts) if (LANDTYPE_FILL[t]) return LANDTYPE_FILL[t];
+      return null;
+    }
+    function getParcelFillColor(p) { return getParcelLandFill(p) || getParcelColor(p); }
+    function getParcelFillOpacity(p) { return getParcelLandFill(p) ? LANDTYPE_FILL_OPACITY : 0.06; }
     // Độ dày viền: đồng nhất 1.5 cho mọi thửa (không phân biệt trạng thái).
     function getParcelWeight(p) {
       return 1.5;
@@ -3534,7 +3559,7 @@
       const poly = L.polygon(p.rings, {
         renderer: mapCanvasRenderer,
         color: baseColor, weight: getParcelWeight(p),
-        fillColor: baseColor, fillOpacity: 0.06,
+        fillColor: getParcelFillColor(p), fillOpacity: getParcelFillOpacity(p),
         interactive: true, bubblingMouseEvents: false
       });
       poly.on('click tap', e => {
@@ -3990,7 +4015,7 @@
     function openPopup(p) {
       hideSuggestions();
       if (activeP && activeP._poly)
-        activeP._poly.setStyle({ color: getParcelColor(activeP), fillColor: getParcelColor(activeP), weight: getParcelWeight(activeP), fillOpacity: 0.06 });
+        activeP._poly.setStyle({ color: getParcelColor(activeP), fillColor: getParcelFillColor(activeP), weight: getParcelWeight(activeP), fillOpacity: getParcelFillOpacity(activeP) });
 
       activeP = p;
       // Đảm bảo thửa có mặt trên bản đồ dù đang ở ngoài khung nhìn hiện tại (vd:
@@ -3998,7 +4023,7 @@
       // và bay camera đến, vì với viewport culling không phải thửa nào cũng luôn
       // có sẵn polygon trên bản đồ.
       // Bôi đậm thửa được chọn (cyan)
-      if (p._poly) p._poly.setStyle({ color: '#00ffcc', weight: (p.trangThaiDK === 'DDK' ? 3.5 : 2.5), fillOpacity: 0.2 });
+      if (p._poly) p._poly.setStyle({ color: '#00ffcc', weight: (p.trangThaiDK === 'DDK' ? 3.5 : 2.5), fillOpacity: Math.max(0.2, getParcelFillOpacity(p)) });
 
       document.getElementById('searchInput').value = p.id;
 
@@ -4043,7 +4068,7 @@
     function closePopup() {
       document.getElementById('popup').classList.remove('open');
       if (activeP && activeP._poly)
-        activeP._poly.setStyle({ color: getParcelColor(activeP), fillColor: getParcelColor(activeP), weight: getParcelWeight(activeP), fillOpacity: 0.06 });
+        activeP._poly.setStyle({ color: getParcelColor(activeP), fillColor: getParcelFillColor(activeP), weight: getParcelWeight(activeP), fillOpacity: getParcelFillOpacity(activeP) });
       activeP = null;
     }
 
@@ -4525,7 +4550,7 @@
         // Chỉ cần khôi phục màu cho các thửa ĐANG hiển thị trên bản đồ, không phải
         // toàn bộ allParcels (những thửa chưa vẽ không có style gì để khôi phục).
         renderedSet.forEach(p => {
-          if (p._poly) p._poly.setStyle({ color: getParcelColor(p), fillColor: getParcelColor(p), fillOpacity: 0.06 });
+          if (p._poly) p._poly.setStyle({ color: getParcelColor(p), fillColor: getParcelFillColor(p), fillOpacity: getParcelFillOpacity(p) });
           if (p._dot) p._dot.setStyle({ fillColor: '#1a6fd4', fillOpacity: 1 });
         });
         hideSuggestions();
