@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TDMAP.PRO.VN.DAMRONG1</title>
-  <!-- 210926  -->
+  <!-- 220926  -->
 
   <!-- ICON HIỂN THỊ TRÊN TAB TRÌNH DUYỆT + KHI TẠO PHÍM TẮT NGOÀI MÀN HÌNH ĐIỆN THOẠI  -->
   <!-- Đặt file app-icon.ico cùng thư mục với index.html (và manifest.json) trên server  -->
@@ -3547,6 +3547,16 @@
     }
     function getParcelFillColor(p) { return getParcelLandFill(p) || getParcelColor(p); }
     function getParcelFillOpacity(p) { return getParcelLandFill(p) ? LANDTYPE_FILL_OPACITY : 0.06; }
+    // Khôi phục màu nền đặc trưng cho MỌI thửa đất giao thông (DGT)/thủy lợi (DTL)/
+    // sông ngòi (SON) đang hiển thị trên bản đồ (trừ thửa exceptP, nếu có) - gọi mỗi
+    // khi chọn/mở 1 thửa để đảm bảo các thửa loại đất này không bao giờ bị mờ/khuất
+    // do còn sót màu mờ từ lần lọc tìm kiếm trước đó.
+    function restoreSpecialLandStyles(exceptP) {
+      renderedSet.forEach(sp => {
+        if (sp === exceptP || !sp._poly || !getParcelLandFill(sp)) return;
+        sp._poly.setStyle({ color: getParcelColor(sp), fillColor: getParcelFillColor(sp), fillOpacity: getParcelFillOpacity(sp) });
+      });
+    }
     // Độ dày viền: đồng nhất 1.5 cho mọi thửa (không phân biệt trạng thái).
     function getParcelWeight(p) {
       return 1.5;
@@ -4023,7 +4033,13 @@
       // và bay camera đến, vì với viewport culling không phải thửa nào cũng luôn
       // có sẵn polygon trên bản đồ.
       // Bôi đậm thửa được chọn (cyan)
-      if (p._poly) p._poly.setStyle({ color: '#00ffcc', weight: (p.trangThaiDK === 'DDK' ? 3.5 : 2.5), fillOpacity: Math.max(0.2, getParcelFillOpacity(p)) });
+      if (p._poly) p._poly.setStyle({ color: '#00ffcc', fillColor: getParcelFillColor(p), weight: (p.trangThaiDK === 'DDK' ? 3.5 : 2.5), fillOpacity: Math.max(0.2, getParcelFillOpacity(p)) });
+
+      // Phòng trường hợp bộ lọc tìm kiếm trước đó còn để lại màu mờ trên các thửa
+      // đất giao thông (DGT)/thủy lợi (DTL)/sông ngòi (SON) đang hiển thị - luôn
+      // khôi phục màu nền đặc trưng của các thửa này (trừ thửa vừa chọn) mỗi khi
+      // chọn/mở 1 thửa, để chúng không bao giờ bị mờ hay khuất đi.
+      restoreSpecialLandStyles(p);
 
       document.getElementById('searchInput').value = p.id;
 
@@ -4070,6 +4086,7 @@
       if (activeP && activeP._poly)
         activeP._poly.setStyle({ color: getParcelColor(activeP), fillColor: getParcelFillColor(activeP), weight: getParcelWeight(activeP), fillOpacity: getParcelFillOpacity(activeP) });
       activeP = null;
+      restoreSpecialLandStyles();
     }
 
     // Chuỗi thông tin thửa dùng để copy - dạng "Tờ: 140, Thửa: 56" (không kèm
@@ -4560,8 +4577,16 @@
       const matches = [];
       allParcels.forEach(p => {
         const isPartial = matchParcel(p, q);
+        // Thửa đất giao thông (DGT)/thủy lợi (DTL)/sông ngòi (SON) giữ nguyên màu
+        // nền đặc trưng, KHÔNG bị làm mờ khi lọc tìm kiếm không khớp - để luôn dễ
+        // nhận biết ranh giới các loại đất này trên bản đồ.
+        const isSpecialLand = !isPartial && !!getParcelLandFill(p);
         if (p._poly) {
-          p._poly.setStyle({ color: isPartial ? '#00ffcc' : getParcelDimColor(p), fillColor: isPartial ? '#00ffcc' : getParcelDimColor(p), fillOpacity: isPartial ? 0.2 : 0.02 });
+          if (isSpecialLand) {
+            p._poly.setStyle({ color: getParcelColor(p), fillColor: getParcelFillColor(p), fillOpacity: getParcelFillOpacity(p) });
+          } else {
+            p._poly.setStyle({ color: isPartial ? '#00ffcc' : getParcelDimColor(p), fillColor: isPartial ? '#00ffcc' : getParcelDimColor(p), fillOpacity: isPartial ? 0.2 : 0.02 });
+          }
         }
         if (p._dot) {
           p._dot.setStyle({ fillColor: isPartial ? '#00c6a7' : '#1a6fd4', fillOpacity: isPartial ? 1 : 0.2 });
